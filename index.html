@@ -10,264 +10,428 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--navy:#102a43;--blue:#1769aa;--teal:#0f9d8a;--bg:#f2f6fb;--ink:#172b4d}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,'Noto Sans Devanagari',sans-serif;color:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--ink)}
 header{background:linear-gradient(120deg,#102a43,#1769aa);color:white;padding:20px 15px;text-align:center}
-header h1{font-size:23px;margin:0 0 5px}header p{margin:0;font-size:13px;opacity:.9}
+header h1{font-size:23px;margin:0 0 5px}
+header p{margin:0;font-size:13px}
 main{max-width:1200px;margin:auto;padding:14px}
 .panel{background:white;border-radius:14px;padding:15px;margin-bottom:14px;box-shadow:0 3px 14px #17324d12}
-.upload{border:2px dashed #91b7d7;text-align:center;background:#f8fbff}
+.upload{border:2px dashed #91b7d7;background:#f8fbff}
 input,select,button{font:inherit;border-radius:9px;padding:11px;border:1px solid #cbd5e1;max-width:100%}
 input[type=file]{width:100%;background:white;margin:10px 0}
 button{border:0;background:var(--blue);color:white;font-weight:700;cursor:pointer;margin:3px}
-button.green{background:var(--teal)}button.dark{background:var(--navy)}button.light{background:#e6eef7;color:var(--navy)}
+button.green{background:var(--teal)}
+button.dark{background:var(--navy)}
+button.light{background:#e6eef7;color:var(--navy)}
+button:disabled{opacity:.6}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.note{font-size:13px;color:#64748b;line-height:1.6}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.stat{background:white;padding:14px;border-radius:13px;box-shadow:0 3px 14px #17324d10;border-top:4px solid var(--blue);min-width:0}
-.stat:nth-child(2){border-color:var(--teal)}.stat:nth-child(3){border-color:#f59e0b}.stat:nth-child(4){border-color:#7c3aed}
-.stat small{display:block;color:#64748b;font-size:12px}.stat strong{display:block;font-size:23px;margin-top:7px;overflow-wrap:anywhere}
-.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}.filters input,.filters select{width:100%}
+.stat{background:white;padding:14px;border-radius:13px;border-top:4px solid var(--blue);min-width:0}
+.stat:nth-child(2){border-color:var(--teal)}
+.stat:nth-child(3){border-color:#f59e0b}
+.stat:nth-child(4){border-color:#7c3aed}
+.stat small{display:block;color:#64748b}
+.stat strong{display:block;font-size:23px;margin-top:7px;overflow-wrap:anywhere}
+.manual-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.manual-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.manual-grid input{width:100%;min-width:0;font-weight:400}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.filters input,.filters select{width:100%}
 .tablewrap{overflow:auto;max-height:65vh;border:1px solid #e2e8f0;border-radius:10px}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1050px;background:white}th,td{padding:10px 9px;border-bottom:1px solid #e7edf4;text-align:left;font-size:13px;white-space:nowrap}
-th{background:#eaf2fa;position:sticky;top:0;z-index:2;color:#12324e}tbody tr:hover{background:#f7fbff}
-/* ग्राहक का नाम बाईं ओर फ्रीज़ रहेगा; बाकी कॉलम साइड में स्क्रॉल होंगे */
-th.name-freeze,td.name-freeze{position:sticky;left:0;min-width:155px;max-width:190px;background:#fff;z-index:3;box-shadow:2px 0 4px #102a4318}
-th.name-freeze{top:0;background:#dff3fb;z-index:4}tbody tr:hover td.name-freeze{background:#f7fbff}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:1050px;background:white}
+th,td{padding:10px 9px;border-bottom:1px solid #e7edf4;text-align:left;font-size:13px;white-space:nowrap}
+th{background:#eaf2fa;position:sticky;top:0;z-index:2}
+th.name-freeze,td.name-freeze{position:sticky;left:0;min-width:155px;background:white;z-index:3;box-shadow:2px 0 4px #102a4318}
+th.name-freeze{top:0;background:#dff3fb;z-index:4}
 .badge{background:#e0f2fe;color:#075985;padding:4px 7px;border-radius:20px;font-weight:bold}
-.note{font-size:12px;color:#64748b;line-height:1.5}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row label{font-size:13px}
-.manual-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}.manual-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}.manual-grid input{width:100%;min-width:0;font-weight:400}@media(max-width:650px){.manual-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:650px){header h1{font-size:20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat strong{font-size:21px}.filters{grid-template-columns:1fr}.panel{padding:12px}main{padding:10px}}
-@media print{body{background:white}header{background:white;color:black;padding:8px}.upload,.filters,button,.no-print,.note{display:none!important}main{max-width:none;padding:0}.panel,.stat{box-shadow:none;border:1px solid #ddd}.stats{grid-template-columns:repeat(4,1fr)}.tablewrap{max-height:none;overflow:visible}table{min-width:0}th,td{font-size:9px;padding:5px;white-space:normal}th{position:static}}
+@media(max-width:650px){
+ header h1{font-size:20px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .manual-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .filters{grid-template-columns:1fr}
+ main{padding:10px}
+ .panel{padding:12px}
+}
+@media print{
+ .no-print,button,.upload{display:none!important}
+ .tablewrap{max-height:none;overflow:visible}
+ table{min-width:0}
+ th,td{font-size:9px;padding:5px;white-space:normal}
+}
 </style>
 </head>
 <body>
-<header><h1>SAINI TRADING COMPANY</h1><p>Gate Pass Excel Manager • डेटा अपलोड, सर्च और कुल हिसाब</p></header>
+<header>
+<h1>SAINI TRADING COMPANY</h1>
+<p>Gate Pass Excel Manager • डेटा अपलोड, सर्च और कुल हिसाब</p>
+</header>
 <main>
+
 <section class="panel upload no-print">
-  <h3 style="margin:0 0 5px">📁 Excel शीट अपलोड करें</h3>
-  <div class="note">अपनी .xlsx या .xls फाइल चुनें। पहली शीट की पहली लाइन में कॉलम के नाम होने चाहिए। अपलोड किया डेटा Firebase Realtime Database में सेव होगा और दूसरे डिवाइस पर भी मिल सकेगा।</div>
-  <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
-  <div class="row">
-    <button onclick="document.getElementById('fileInput').click()">Excel चुनें / अपलोड करें</button>
-    <button class="green" onclick="exportExcel()">⬇ Excel डाउनलोड करें</button>
-    <button class="dark" onclick="window.print()">🖨 प्रिंट करें</button>
-    <button class="light" onclick="clearData()">डेटा साफ करें</button>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <label>1 बोरे का वजन (किलो): <input id="bagWeight" type="number" min="1" step="0.1" value="37.5" style="width:100px" onchange="render()"></label>
-    <span class="note">बोरे = Qty (क्विंटल) × 100 ÷ 37.5</span>
-  </div>
-  <div id="status" class="note" style="margin-top:8px">Firebase से कनेक्ट हो रहा है…</div>
+<h3>📁 Excel शीट अपलोड करें</h3>
+<p class="note">पहली शीट की पहली लाइन में कॉलम के नाम होने चाहिए। डेटा Firebase में सेव होगा।</p>
+<input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+<div class="row">
+<button onclick="document.getElementById('fileInput').click()">Excel चुनें / अपलोड करें</button>
+<button class="green" onclick="exportExcel()">⬇ Excel डाउनलोड करें</button>
+<button class="dark" onclick="window.print()">🖨 प्रिंट करें</button>
+</div>
+<div class="row" style="margin-top:10px">
+<label>1 बोरे का वजन (किलो):
+<input id="bagWeight" type="number" min="1" step="0.1" value="37.5" style="width:100px" onchange="render()">
+</label>
+</div>
+<div id="status" class="note">Firebase से कनेक्ट हो रहा है…</div>
 </section>
-<section class="panel no-print" id="manualEntryPanel">
-  <h3 style="margin:0 0 8px">✍️ मैनुअल एंट्री डालें (Firebase टेस्ट)</h3>
-  <p class="note">Excel अपलोड नहीं हो रही तो एक रिकॉर्ड यहाँ भरकर सेव करें। सेव होने पर यह Firebase Realtime Database में जाएगा और बाकी रिकॉर्ड के साथ दिखेगा।</p>
-  <div class="manual-grid">
-    <label>तारीख<input id="mDate" type="date"></label>
-    <label>ग्राहक का नाम *<input id="mName" type="text" placeholder="ग्राहक का नाम"></label>
-    <label>गाँव / पता<input id="mVillage" type="text" placeholder="गाँव"></label>
-    <label>मोबाइल<input id="mMobile" type="tel" inputmode="numeric" placeholder="मोबाइल नंबर"></label>
-    <label>Gate Pass नंबर *<input id="mGatepass" type="text" placeholder="Gate Pass नंबर"></label>
-    <label>Qty (क्विंटल) *<input id="mQty" type="number" min="0" step="0.01" placeholder="जैसे 12.50"></label>
-    <label>मंडी<input id="mMandi" type="text" placeholder="मंडी"></label>
-    <label>स्थिति<input id="mStatus" type="text" placeholder="स्थिति (यदि हो)"></label>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <button class="green" id="manualSaveBtn" onclick="saveManualEntry()">Firebase में सेव करें</button>
-    <button class="light" onclick="resetManualForm()">फॉर्म साफ करें</button>
-  </div>
-  <div id="manualStatus" class="note" role="status" style="margin-top:8px">पहले एक टेस्ट एंट्री भरें।</div>
+
+<section class="panel no-print">
+<h3>✍️ मैनुअल एंट्री डालें</h3>
+<p class="note">एक रिकॉर्ड भरकर Firebase में सेव करें।</p>
+<div class="manual-grid">
+<label>तारीख<input id="mDate" type="date"></label>
+<label>ग्राहक का नाम *<input id="mName" placeholder="ग्राहक का नाम"></label>
+<label>गाँव / पता<input id="mVillage" placeholder="गाँव"></label>
+<label>मोबाइल<input id="mMobile" type="tel" placeholder="मोबाइल नंबर"></label>
+<label>Gate Pass नंबर *<input id="mGatepass" placeholder="Gate Pass नंबर"></label>
+<label>Qty (क्विंटल) *<input id="mQty" type="number" min="0" step="0.01" placeholder="जैसे 12.50"></label>
+<label>मंडी<input id="mMandi" placeholder="मंडी"></label>
+<label>स्थिति<input id="mStatus" placeholder="स्थिति"></label>
+</div>
+<div class="row" style="margin-top:10px">
+<button class="green" id="manualSaveBtn" onclick="saveManualEntry()">Firebase में सेव करें</button>
+<button class="light" onclick="resetManualForm()">फॉर्म साफ करें</button>
+</div>
+<div id="manualStatus" class="note">पहले एक एंट्री भरें।</div>
 </section>
+
 <section class="stats">
- <div class="stat"><small>कुल एंट्री</small><strong id="totalEntries">0</strong></div>
- <div class="stat"><small>कुल क्विंटल / Qty</small><strong id="totalBore">0</strong></div>
- <div class="stat"><small>कुल बोरे (37.5 kg)</small><strong id="totalQtl">0.00</strong></div>
- <div class="stat"><small>दिख रही एंट्री</small><strong id="visibleEntries">0</strong></div>
+<div class="stat"><small>कुल एंट्री</small><strong id="totalEntries">0</strong></div>
+<div class="stat"><small>कुल क्विंटल / Qty</small><strong id="totalBore">0</strong></div>
+<div class="stat"><small>कुल बोरे</small><strong id="totalQtl">0.00</strong></div>
+<div class="stat"><small>दिख रही एंट्री</small><strong id="visibleEntries">0</strong></div>
 </section>
+
 <section class="panel">
- <div class="filters no-print">
-  <input id="search" placeholder="🔎 नाम, गाँव, मोबाइल, Gate Pass से खोजें..." oninput="render()">
-  <input id="dateFilter" type="date" title="तारीख से फ़िल्टर" onchange="render()">
-  <select id="villageFilter" onchange="render()"><option value="">सभी गाँव</option></select>
- </div>
- <div id="searchSummary" class="stats" style="margin-top:12px;display:none">
-  <div class="stat"><small>सर्च किए नाम की एंट्री</small><strong id="personEntries">0</strong></div>
-  <div class="stat"><small>उसके कुल क्विंटल / Qty</small><strong id="personBore">0</strong></div>
-  <div class="stat"><small>उसके कुल क्विंटल</small><strong id="personQtl">0.00</strong></div>
-  <div class="stat"><small>उसके Gate Pass</small><strong id="personPasses">0</strong></div>
- </div>
- <div class="row" style="justify-content:space-between;margin:12px 0">
-  <strong>Gate Pass रिकॉर्ड</strong><span class="note">नाम बाईं ओर फ्रीज़ रहेगा • बाकी टेबल देखने के लिए साइड में स्क्रॉल करें। कुल हिसाब केवल असली Gate Pass एंट्री का है।</span>
- </div>
- <div class="tablewrap"><table>
- <thead><tr><th class="name-freeze">ग्राहक का नाम</th><th>#</th><th>तारीख</th><th>गाँव / पता</th><th>मोबाइल</th><th>Gate Pass नंबर</th><th>Qty (क्विंटल)</th><th>बोरे (37.5 kg)</th><th>मंडी</th><th>स्थिति</th></tr></thead>
- <tbody id="tbody"><tr><td colspan="10" style="text-align:center;padding:25px">पहले Excel फाइल अपलोड करें।</td></tr></tbody>
- </table></div>
+<div class="filters no-print">
+<input id="search" placeholder="🔎 नाम, गाँव, मोबाइल, Gate Pass खोजें..." oninput="render()">
+<input id="dateFilter" type="date" onchange="render()">
+<select id="villageFilter" onchange="render()"><option value="">सभी गाँव</option></select>
+</div>
+<div class="row" style="justify-content:space-between;margin:12px 0">
+<strong>Gate Pass रिकॉर्ड</strong>
+<span class="note">नाम बाईं ओर फ्रीज़ रहेगा • टेबल साइड में स्क्रॉल होगी।</span>
+</div>
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th class="name-freeze">ग्राहक का नाम</th><th>#</th><th>तारीख</th>
+<th>गाँव / पता</th><th>मोबाइल</th><th>Gate Pass नंबर</th>
+<th>Qty (क्विंटल)</th><th>बोरे</th><th>मंडी</th><th>स्थिति</th>
+</tr>
+</thead>
+<tbody id="tbody">
+<tr><td colspan="10">पहले Excel फाइल अपलोड करें।</td></tr>
+</tbody>
+</table>
+</div>
 </section>
-<p class="note">ध्यान दें: आपकी फाइल में <b>Gatepass Qty</b> को Qty/बोरे माना गया है। Qty सीधे क्विंटल है; बोरे = क्विंटल × 100 ÷ 37.5। Excel की Total/Summary लाइन नहीं गिनी जाएगी; वही Gate Pass दोबारा अपलोड करने पर डुप्लीकेट रिकॉर्ड स्किप होंगे। Excel डाउनलोड में अपलोड की गई मूल शीट का पूरा डेटा शामिल रहेगा।</p>
 </main>
+
 <script>
-let rows=[], headers=[], originalRows=[];
-// Saini Trading Company Firebase Realtime Database
-const firebaseConfig = {
-  apiKey: "AIzaSyDZcOc-H9DUGPj_5euImVr8QGMBvyhv8LA",
-  authDomain: "jform-5b6fa.firebaseapp.com",
-  databaseURL: "https://jform-5b6fa-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "jform-5b6fa",
-  storageBucket: "jform-5b6fa.firebasestorage.app",
-  messagingSenderId: "105469766353",
-  appId: "1:105469766353:web:817db55469edd27d1a73f0",
-  measurementId: "G-7GS49BGVGW"
+let rows=[];
+let headers=[];
+
+const firebaseConfig={
+ apiKey:"AIzaSyDZcOc-H9DUGPj_5euImVr8QGMBvyhv8LA",
+ authDomain:"jform-5b6fa.firebaseapp.com",
+ databaseURL:"https://jform-5b6fa-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"jform-5b6fa",
+ storageBucket:"jform-5b6fa.firebasestorage.app",
+ messagingSenderId:"105469766353",
+ appId:"1:105469766353:web:817db55469edd27d1a73f0"
 };
-let firebaseReady=false, gatePassRef=null;
-try {
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  gatePassRef=firebase.database().ref('gatePassExcelRecords');
-} catch(e) { console.error('Firebase init error',e); }
-function recordKey(r){
-  const gp=String(val(r,'gatepass')).trim();
-  if(gp) return 'GP:'+gp.toLowerCase();
-  return 'ROW:'+Object.keys(r).filter(k=>!k.startsWith('__')).sort().map(k=>String(r[k]??'').trim().toLowerCase()).join('|');
+
+let gatePassRef=null;
+
+try{
+ if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+ gatePassRef=firebase.database().ref("gatePassExcelRecords");
+}catch(e){
+ console.error(e);
+ setStatus("Firebase शुरू नहीं हुआ: "+e.message);
 }
-function setStatus(message){const el=document.getElementById('status');if(el)el.textContent=message;}
-async function withTimeout(promise, ms, label){
-  let timer; try { return await Promise.race([promise, new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' में समय अधिक लग रहा है। इंटरनेट जाँचकर दोबारा कोशिश करें।')),ms);})]); } finally { clearTimeout(timer); }
-}
-async function ensureLogin(){
-  if(firebase.auth().currentUser) return firebase.auth().currentUser;
-  setStatus(location.protocol.startsWith('http')?'Firebase Anonymous Login हो रहा है…':'Firebase Login के लिए HTTPS वेबसाइट जरूरी हो सकती है…');
-  try { await withTimeout(firebase.auth().signInAnonymously(),20000,'Firebase Login'); } catch (e) { if (!location.protocol.startsWith('http')) { throw new Error('Firebase Login नहीं हो पाया। यह HTML मोबाइल के Downloads (content://) से खुल रही है। इसे HTTPS वेबसाइट पर खोलना जरूरी है, जैसे Netlify।'); } throw e; }
-  return firebase.auth().currentUser;
-}
-async function loadFirebaseRecords(){
-  if(!gatePassRef){setStatus('Firebase शुरू नहीं हुआ। इंटरनेट और Firebase सेटिंग जाँचें।');return;}
-  try{
-    await ensureLogin();
-    const snap=await gatePassRef.once('value');
-    const saved=snap.val()||{};
-    const loaded=Object.values(saved).filter(x=>x&&typeof x==='object'&&!x.__meta);
-    const seen=new Set();
-    rows=loaded.filter(r=>{const k=recordKey(r);if(seen.has(k))return false;seen.add(k);return true;});
-    if(rows.length){headers=[...new Set(rows.flatMap(r=>Object.keys(r).filter(k=>!k.startsWith('__'))))];buildVillages();render();}
-    firebaseReady=true;
-    setStatus(`Firebase कनेक्ट है • ${rows.length} रिकॉर्ड लोड हुए।`);
-  }catch(e){console.error(e);setStatus('Firebase डेटा नहीं पढ़ सका: '+(e.message||e)+'। Database Rules/Internet जाँचें।');}
+
+/* Firebase में . # $ / [ ] और control characters key में नहीं हो सकते */
+function safeFirebaseRecord(record){
+ const safe={};
+ for(const [rawKey,value] of Object.entries(record||{})){
+  let key=String(rawKey??"")
+   .replace(/[.#$\/\[\]\u0000-\u001F\u007F]/g,"_")
+   .trim();
+  if(!key)key="field";
+  let finalKey=key,n=2;
+  while(Object.prototype.hasOwnProperty.call(safe,finalKey)){
+   finalKey=key+"_"+n++;
+  }
+  safe[finalKey]=value;
+ }
+ return safe;
 }
 
 const aliases={
- date:['Date','तारीख','दिनांक'], name:['Farmer Name','Customer Name','Name','ग्राहक का नाम','किसान का नाम'],
- village:['Village','गाँव','गांव','Address','Mandi Name'], mobile:['Mobile No.','Mobile','Phone','मोबाइल'],
- gatepass:['GatePass Number','Gate Pass Number','Gatepass No','Gate Pass','गेट पास नंबर'],
- qty:['Gatepass Qty','Gate Pass Qty','Qty','Quantity','Bore','बोरे'], mandi:['Mandi Name','मंडी'],
- status:['Status','स्थिति']
+ date:["Date","तारीख","दिनांक"],
+ name:["Farmer Name","Customer Name","Name","ग्राहक का नाम","किसान का नाम"],
+ village:["Village","गाँव","गांव","Address"],
+ mobile:["Mobile No.","Mobile No_","Mobile No","Mobile","Phone","मोबाइल"],
+ gatepass:["GatePass Number","Gate Pass Number","Gatepass No","Gate Pass","गेट पास नंबर"],
+ qty:["Gatepass Qty","Gate Pass Qty","Qty","Quantity","Bore","बोरे"],
+ mandi:["Mandi Name","मंडी"],
+ status:["Status","स्थिति"]
 };
-function norm(v){return String(v??'').trim().toLowerCase().replace(/[\s_-]/g,'')}
-function findKey(obj, names){let keys=Object.keys(obj);for(let n of names){let k=keys.find(x=>norm(x)===norm(n));if(k!==undefined)return k}return null}
-function val(r,field){let k=findKey(r,aliases[field]);return k===null?'':r[k]??''}
-function num(v){if(typeof v==='number')return v;let n=parseFloat(String(v??'').replace(/,/g,''));return Number.isFinite(n)?n:0}
-function dateForFilter(v){if(v instanceof Date&&!isNaN(v))return v.toISOString().slice(0,10);let s=String(v??'').trim();let m=s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;let d=new Date(s);return isNaN(d)?'':d.toISOString().slice(0,10)}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-document.getElementById('fileInput').addEventListener('change',async e=>{
- const file=e.target.files[0];if(!file)return;
- setStatus('Excel पढ़ी जा रही है और Firebase से कनेक्शन बनाया जा रहा है…');
- if(!window.XLSX){document.getElementById('status').textContent='Excel लाइब्रेरी लोड नहीं हुई। इंटरनेट चालू करके पेज दोबारा खोलें।';return}
+
+function norm(v){
+ return String(v??"").trim().toLowerCase().replace(/[\s_-]/g,"");
+}
+function findKey(obj,names){
+ const keys=Object.keys(obj);
+ for(const n of names){
+  const k=keys.find(x=>norm(x)===norm(n));
+  if(k!==undefined)return k;
+ }
+ return null;
+}
+function val(r,field){
+ const k=findKey(r,aliases[field]||[]);
+ return k===null?"":r[k]??"";
+}
+function num(v){
+ const n=parseFloat(String(v??"").replace(/,/g,""));
+ return Number.isFinite(n)?n:0;
+}
+function esc(s){
+ return String(s??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+function setStatus(s){
+ document.getElementById("status").textContent=s;
+}
+function manualStatus(s){
+ document.getElementById("manualStatus").textContent=s;
+}
+function recordKey(r){
+ const gp=String(val(r,"gatepass")).trim().toLowerCase();
+ if(gp)return "GP:"+gp;
+ return "ROW:"+["date","name","village","mobile","qty"].map(k=>String(val(r,k)).trim().toLowerCase()).join("|");
+}
+function withTimeout(promise,ms,label){
+ let timer;
+ return Promise.race([
+  promise,
+  new Promise((_,reject)=>{
+   timer=setTimeout(()=>reject(new Error(label+" में समय अधिक लगा। इंटरनेट जाँचें।")),ms);
+  })
+ ]).finally(()=>clearTimeout(timer));
+}
+async function ensureLogin(){
+ if(firebase.auth().currentUser)return firebase.auth().currentUser;
+ setStatus("Firebase Anonymous Login हो रहा है…");
+ await withTimeout(firebase.auth().signInAnonymously(),20000,"Firebase Login");
+ if(!firebase.auth().currentUser)throw new Error("Firebase Login पूरा नहीं हुआ।");
+ return firebase.auth().currentUser;
+}
+
+async function loadFirebaseRecords(){
  try{
- setStatus('Excel फाइल पढ़ी जा रही है…');
- const data=await withTimeout(file.arrayBuffer(),15000,'Excel फाइल पढ़ना');const wb=XLSX.read(data,{type:'array',cellDates:true});
- const ws=wb.Sheets[wb.SheetNames[0]];const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
- if(matrix.length<2)throw new Error('शीट में डेटा नहीं मिला।');
- headers=matrix[0].map((h,i)=>String(h||`Column ${i+1}`).trim());
- originalRows=matrix.slice(1).filter(r=>r.some(c=>String(c??'').trim()!=='')).map(r=>{let o={};headers.forEach((h,i)=>o[h]=r[i]??'');return o}).filter(r=>{
-   // Excel sheet ke end me agar TOTAL / Grand Total / कुल योग wali summary row ho to use entry na ginen.
-   const line=Object.values(r).map(x=>String(x??'').trim().toLowerCase()).join(' ');
-   return !/(^|\s)(grand\s*total|total|कुल\s*(योग|जोड़|क्विंटल|बोरे)|योग|कुल योग)(\s|$)/i.test(line);
+  await ensureLogin();
+  const snap=await withTimeout(gatePassRef.once("value"),15000,"Firebase से रिकॉर्ड पढ़ना");
+  const data=snap.val()||{};
+  rows=Object.values(data).filter(x=>x&&typeof x==="object");
+  headers=[...new Set(rows.flatMap(r=>Object.keys(r)))];
+  buildVillages();
+  render();
+  setStatus("Firebase कनेक्ट है • "+rows.length+" रिकॉर्ड लोड हुए।");
+ }catch(e){
+  console.error(e);
+  setStatus("Firebase से कनेक्ट नहीं हुआ: "+(e.code?e.code+" — ":"")+e.message);
+ }
+}
+
+function buildVillages(){
+ const sel=document.getElementById("villageFilter");
+ const old=sel.value;
+ const list=[...new Set(rows.map(r=>String(val(r,"village")).trim()).filter(Boolean))].sort();
+ sel.innerHTML='<option value="">सभी गाँव</option>'+list.map(v=>'<option>'+esc(v)+'</option>').join("");
+ if(list.includes(old))sel.value=old;
+}
+
+function render(){
+ const bw=Math.max(1,num(document.getElementById("bagWeight").value));
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const dt=document.getElementById("dateFilter").value;
+ const village=document.getElementById("villageFilter").value;
+
+ const filtered=rows.filter(r=>{
+  const hay=[val(r,"name"),val(r,"village"),val(r,"mobile"),val(r,"gatepass")].join(" ").toLowerCase();
+  return (!q||hay.includes(q))&&(!dt||String(val(r,"date")).slice(0,10)===dt)&&(!village||String(val(r,"village"))===village);
  });
- const priorRows=rows.slice();const seen=new Set(priorRows.map(recordKey));let duplicateCount=0;const newRows=[];
- for(const r of originalRows){const key=recordKey(r);if(seen.has(key)){duplicateCount++;continue;}seen.add(key);newRows.push(r);}
- if(!gatePassRef) throw new Error('Firebase शुरू नहीं हुआ। इंटरनेट और Firebase config जाँचें।');
- // पहले Anonymous Authentication पूरा करें; Rules में auth != null के लिए यह जरूरी है।
- await ensureLogin();
- // Firebase से वर्तमान रिकॉर्ड फिर पढ़ें, ताकि दूसरे डिवाइस की एंट्री भी डुप्लीकेट न बने।
- setStatus('Firebase से पुराने रिकॉर्ड जाँचे जा रहे हैं…');
- const snap=await withTimeout(gatePassRef.once('value'),15000,'Firebase से रिकॉर्ड पढ़ना');const cloud=snap.val()||{};const cloudRows=Object.values(cloud).filter(x=>x&&typeof x==='object'&&!x.__meta);
- const cloudSeen=new Set(cloudRows.map(recordKey));let cloudDuplicateCount=0;
- let savedCount=0;
- for(const r of newRows){const key=recordKey(r);if(cloudSeen.has(key)){cloudDuplicateCount++;continue;}cloudSeen.add(key);setStatus(`Firebase में रिकॉर्ड सेव हो रहे हैं… ${savedCount+1}/${newRows.length}`);await withTimeout(gatePassRef.push().set(r),15000,'Firebase में डेटा सेव करना');savedCount++;}
- const refreshed=await withTimeout(gatePassRef.once('value'),15000,'अपलोड के बाद रिकॉर्ड जाँचना');const saved=refreshed.val()||{};
- rows=Object.values(saved).filter(x=>x&&typeof x==='object'&&!x.__meta);
- headers=[...new Set(rows.flatMap(r=>Object.keys(r).filter(k=>!k.startsWith('__'))))];
- document.getElementById('status').textContent=`${file.name} अपलोड पूरी: ${newRows.length-cloudDuplicateCount} नई एंट्री Firebase में सेव • ${duplicateCount+cloudDuplicateCount} डुप्लीकेट स्किप • कुल ${rows.length} रिकॉर्ड • शीट: ${wb.SheetNames[0]}`;
- buildVillages();render();
- }catch(err){console.error('Excel/Firebase upload error:',err);document.getElementById('status').textContent='अपलोड नहीं हुआ: '+(err.code ? err.code+' — ' : '')+(err.message||String(err))+(location.protocol.startsWith('http')?'':' | सुझाव: HTML को HTTPS वेबसाइट पर खोलें।');}
+
+ const total=rows.reduce((s,r)=>s+num(val(r,"qty")),0);
+ document.getElementById("totalEntries").textContent=rows.length;
+ document.getElementById("totalBore").textContent=total.toLocaleString("en-IN",{maximumFractionDigits:2});
+ document.getElementById("totalQtl").textContent=(total*100/bw).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+ document.getElementById("visibleEntries").textContent=filtered.length;
+
+ document.getElementById("tbody").innerHTML=filtered.length?filtered.map((r,i)=>`
+ <tr>
+ <td class="name-freeze"><b>${esc(val(r,"name"))}</b></td>
+ <td>${i+1}</td><td>${esc(val(r,"date"))}</td>
+ <td>${esc(val(r,"village"))}</td><td>${esc(val(r,"mobile"))}</td>
+ <td><span class="badge">${esc(val(r,"gatepass"))}</span></td>
+ <td>${num(val(r,"qty")).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+ <td>${(num(val(r,"qty"))*100/bw).toFixed(2)}</td>
+ <td>${esc(val(r,"mandi"))}</td><td>${esc(val(r,"status"))}</td>
+ </tr>`).join(""):'<tr><td colspan="10" style="text-align:center;padding:25px">कोई रिकॉर्ड नहीं मिला।</td></tr>';
+}
+
+function resetManualForm(){
+ ["mDate","mName","mVillage","mMobile","mGatepass","mQty","mMandi","mStatus"].forEach(id=>document.getElementById(id).value="");
+ manualStatus("फॉर्म साफ है।");
+}
+
+async function saveManualEntry(){
+ const btn=document.getElementById("manualSaveBtn");
+ const name=document.getElementById("mName").value.trim();
+ const gp=document.getElementById("mGatepass").value.trim();
+ const qtyText=document.getElementById("mQty").value.trim();
+
+ if(!name||!gp||qtyText===""){
+  manualStatus("ग्राहक का नाम, Gate Pass नंबर और Qty भरें।");
+  return;
+ }
+ const qty=Number(qtyText);
+ if(!Number.isFinite(qty)||qty<0){
+  manualStatus("Qty सही नंबर में भरें।");
+  return;
+ }
+
+ const entry={
+  Date:document.getElementById("mDate").value,
+  "Customer Name":name,
+  Village:document.getElementById("mVillage").value.trim(),
+  "Mobile No.":document.getElementById("mMobile").value.trim(),
+  "GatePass Number":gp,
+  "Gatepass Qty":qty,
+  "Mandi Name":document.getElementById("mMandi").value.trim(),
+  Status:document.getElementById("mStatus").value.trim()
+ };
+
+ try{
+  btn.disabled=true;
+  btn.textContent="सेव हो रहा है…";
+  manualStatus("Firebase Login हो रहा है…");
+  await ensureLogin();
+
+  const snap=await withTimeout(gatePassRef.once("value"),15000,"Firebase से रिकॉर्ड पढ़ना");
+  const saved=snap.val()||{};
+  const existing=Object.values(saved).filter(x=>x&&typeof x==="object");
+
+  if(existing.some(r=>String(val(r,"gatepass")).trim().toLowerCase()===gp.toLowerCase())){
+   manualStatus("यह Gate Pass नंबर पहले से मौजूद है। डुप्लीकेट सेव नहीं किया।");
+   return;
+  }
+
+  manualStatus("Firebase में रिकॉर्ड सेव हो रहा है…");
+  const ref=gatePassRef.push();
+  await withTimeout(ref.set(safeFirebaseRecord(entry)),15000,"Firebase में डेटा सेव करना");
+
+  const verify=await withTimeout(ref.once("value"),15000,"सेव हुआ डेटा जाँचना");
+  if(!verify.exists())throw new Error("सेव के बाद रिकॉर्ड नहीं मिला।");
+
+  rows=existing.concat([entry]);
+  headers=[...new Set(rows.flatMap(r=>Object.keys(r)))];
+  buildVillages();
+  render();
+  manualStatus("✅ सफल! Gate Pass "+gp+" Firebase में सेव हो गया।");
+
+  resetManualForm();
+  setStatus("Firebase कनेक्ट है • "+rows.length+" रिकॉर्ड उपलब्ध।");
+ }catch(e){
+  console.error(e);
+  manualStatus("❌ सेव नहीं हुआ: "+(e.code?e.code+" — ":"")+e.message);
+ }finally{
+  btn.disabled=false;
+  btn.textContent="Firebase में सेव करें";
+ }
+}
+
+document.getElementById("fileInput").addEventListener("change",async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+
+ try{
+  if(!window.XLSX)throw new Error("Excel लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचें।");
+  setStatus("Excel पढ़ी जा रही है…");
+  await ensureLogin();
+
+  const buffer=await file.arrayBuffer();
+  const wb=XLSX.read(buffer,{type:"array",cellDates:true});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:false});
+  if(matrix.length<2)throw new Error("Excel में डेटा नहीं मिला।");
+
+  const excelHeaders=matrix[0].map((h,i)=>String(h||("Column "+(i+1))).trim());
+  const incoming=matrix.slice(1)
+   .filter(r=>r.some(c=>String(c??"").trim()!==""))
+   .map(r=>{
+    const o={};
+    excelHeaders.forEach((h,i)=>o[h]=r[i]??"");
+    return o;
+   });
+
+  const snap=await withTimeout(gatePassRef.once("value"),15000,"Firebase से रिकॉर्ड पढ़ना");
+  const data=snap.val()||{};
+  const existing=Object.values(data).filter(x=>x&&typeof x==="object");
+  const seen=new Set(existing.map(recordKey));
+  let saved=0,skipped=0;
+
+  for(const r of incoming){
+   const key=recordKey(r);
+   if(seen.has(key)){skipped++;continue;}
+   seen.add(key);
+   setStatus("Firebase में सेव हो रहा है… "+(saved+1));
+   await withTimeout(gatePassRef.push().set(safeFirebaseRecord(r)),15000,"Firebase में रिकॉर्ड सेव करना");
+   saved++;
+  }
+
+  const refreshed=await withTimeout(gatePassRef.once("value"),15000,"अपलोड जाँचना");
+  rows=Object.values(refreshed.val()||{}).filter(x=>x&&typeof x==="object");
+  headers=[...new Set(rows.flatMap(r=>Object.keys(r)))];
+  buildVillages();
+  render();
+  setStatus("✅ अपलोड पूरा। नई एंट्री: "+saved+" • डुप्लीकेट स्किप: "+skipped+" • कुल रिकॉर्ड: "+rows.length);
+ }catch(e){
+  console.error(e);
+  setStatus("❌ अपलोड नहीं हुआ: "+(e.code?e.code+" — ":"")+e.message);
+ }
 });
 
-function manualStatus(message){const el=document.getElementById('manualStatus');if(el)el.textContent=message;}
-function resetManualForm(){['mDate','mName','mVillage','mMobile','mGatepass','mQty','mMandi','mStatus'].forEach(id=>document.getElementById(id).value='');manualStatus('फॉर्म साफ है।');}
-async function saveManualEntry(){
- const btn=document.getElementById('manualSaveBtn');
- const name=document.getElementById('mName').value.trim();
- const gp=document.getElementById('mGatepass').value.trim();
- const qtyText=document.getElementById('mQty').value.trim();
- if(!name||!gp||qtyText===''){manualStatus('कृपया ग्राहक का नाम, Gate Pass नंबर और Qty भरें।');return;}
- const qty=Number(qtyText);if(!Number.isFinite(qty)||qty<0){manualStatus('Qty सही नंबर में भरें।');return;}
- const entry={Date:document.getElementById('mDate').value, 'Customer Name':name, Village:document.getElementById('mVillage').value.trim(), 'Mobile No.':document.getElementById('mMobile').value.trim(), 'GatePass Number':gp, 'Gatepass Qty':qty, 'Mandi Name':document.getElementById('mMandi').value.trim(), Status:document.getElementById('mStatus').value.trim(), __manual:true};
- try{
-  if(!gatePassRef)throw new Error('Firebase शुरू नहीं हुआ। Firebase config और इंटरनेट जाँचें।');
-  btn.disabled=true;btn.textContent='सेव हो रहा है…';manualStatus('Firebase Login हो रहा है…');
-  await ensureLogin();
-  manualStatus('Firebase में Gate Pass नंबर जाँच रहे हैं…');
-  const snap=await withTimeout(gatePassRef.once('value'),15000,'Firebase से रिकॉर्ड पढ़ना');
-  const saved=snap.val()||{};const vals=Object.values(saved).filter(x=>x&&typeof x==='object'&&!x.__meta);
-  if(vals.some(r=>String(val(r,'gatepass')).trim().toLowerCase()===gp.toLowerCase())){manualStatus('यह Gate Pass नंबर पहले से मौजूद है। डुप्लीकेट सेव नहीं किया।');return;}
-  manualStatus('Firebase में रिकॉर्ड सेव हो रहा है…');
-  const ref=gatePassRef.push();
-  await withTimeout(ref.set(entry),15000,'Firebase में डेटा सेव करना');
-  const verify=await withTimeout(ref.once('value'),15000,'सेव हुआ डेटा जाँचना');
-  if(!verify.exists())throw new Error('सेव के बाद रिकॉर्ड नहीं मिला।');
-  rows=vals.concat([entry]);
-  headers=[...new Set(rows.flatMap(r=>Object.keys(r).filter(k=>!k.startsWith('__'))))];
-  buildVillages();render();manualStatus('✅ सफल! Gate Pass '+gp+' Firebase में सेव हो गया। अब Firebase Data टैब में gatePassExcelRecords खोलकर भी जाँचें।');
-  ['mDate','mName','mVillage','mMobile','mGatepass','mQty','mMandi','mStatus'].forEach(id=>document.getElementById(id).value='');
-  setStatus('Firebase कनेक्ट है • '+rows.length+' रिकॉर्ड उपलब्ध।');
- }catch(e){console.error('Manual Firebase save error',e);manualStatus('❌ सेव नहीं हुआ: '+(e.code?e.code+' — ':'')+(e.message||String(e))+(location.protocol==='file:'||location.protocol==='content:'?' | इस HTML को HTTPS वेबसाइट पर खोलकर कोशिश करें।':''));}
- finally{btn.disabled=false;btn.textContent='Firebase में सेव करें';}
+function exportExcel(){
+ if(!rows.length){alert("पहले रिकॉर्ड लोड करें।");return;}
+ const wb=XLSX.utils.book_new();
+ const hs=[...new Set(rows.flatMap(r=>Object.keys(r)))];
+ const data=[hs,...rows.map(r=>hs.map(h=>r[h]??""))];
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(data),"Gate Pass Data");
+ XLSX.writeFile(wb,"Saini_Trading_GatePass_Data.xlsx");
 }
 
-function buildVillages(){let sel=document.getElementById('villageFilter'),old=sel.value;let set=[...new Set(rows.map(r=>String(val(r,'village')).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));sel.innerHTML='<option value="">सभी गाँव</option>'+set.map(v=>`<option>${esc(v)}</option>`).join('');if(set.includes(old))sel.value=old}
-function render(){
- const bw=Math.max(0,num(document.getElementById('bagWeight').value));
- const q=document.getElementById('search').value.trim().toLowerCase(),dt=document.getElementById('dateFilter').value,v=document.getElementById('villageFilter').value;
- const filtered=rows.filter(r=>{
-  let hay=[val(r,'name'),val(r,'village'),val(r,'mobile'),val(r,'gatepass'),val(r,'date'),val(r,'mandi')].join(' ').toLowerCase();
-  return (!q||hay.includes(q))&&(!dt||dateForFilter(val(r,'date'))===dt)&&(!v||String(val(r,'village')).trim()===v)
- });
- const totalQty=rows.reduce((s,r)=>s+num(val(r,'qty')),0);
- document.getElementById('totalEntries').textContent=rows.length.toLocaleString('en-IN');
- document.getElementById('totalBore').textContent=totalQty.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
- document.getElementById('totalQtl').textContent=(bw>0?totalQty*100/bw:0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
- document.getElementById('visibleEntries').textContent=filtered.length.toLocaleString('en-IN');
- const summary=document.getElementById('searchSummary');
- if(q || dt || v){
-   const sq=filtered.reduce((s,r)=>s+num(val(r,'qty')),0);
-   const passes=new Set(filtered.map(r=>String(val(r,'gatepass')).trim()).filter(Boolean)).size;
-   summary.style.display='grid';
-   document.getElementById('personEntries').textContent=filtered.length.toLocaleString('en-IN');
-   document.getElementById('personBore').textContent=(bw>0?sq*100/bw:0).toLocaleString('en-IN',{maximumFractionDigits:2});
-   document.getElementById('personQtl').textContent=sq.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-   document.getElementById('personPasses').textContent=passes.toLocaleString('en-IN');
- } else summary.style.display='none';
- document.getElementById('tbody').innerHTML=filtered.length?filtered.map((r,i)=>`<tr><td class="name-freeze"><b>${esc(val(r,'name'))}</b></td><td>${i+1}</td><td>${esc(val(r,'date'))}</td><td>${esc(val(r,'village'))}</td><td>${esc(val(r,'mobile'))}</td><td><span class="badge">${esc(val(r,'gatepass'))}</span></td><td>${num(val(r,'qty')).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td>${(bw>0?num(val(r,'qty'))*100/bw:0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td>${esc(val(r,'mandi'))}</td><td>${esc(val(r,'status'))}</td></tr>`).join(''):'<tr><td colspan="10" style="text-align:center;padding:25px">कोई रिकॉर्ड नहीं मिला।</td></tr>';
-}
-function exportExcel(){
- if(!rows.length){alert('पहले Excel फाइल अपलोड करें।');return}
- const wb=XLSX.utils.book_new();
- const data=[headers,...rows.map(r=>headers.map(h=>r[h]??''))];
- const ws=XLSX.utils.aoa_to_sheet(data);XLSX.utils.book_append_sheet(wb,ws,'Gate Pass Data');
- const report=[['Saini Trading Company - Summary'],['Total Entries',rows.length],['Total Qty / Bore',rows.reduce((s,r)=>s+num(val(r,'qty')),0)],['Bag Weight (kg)',num(document.getElementById('bagWeight').value)],['Estimated Total Bags (37.5 kg default)',rows.reduce((s,r)=>s+num(val(r,'qty')),0)*100/num(document.getElementById('bagWeight').value)]];
- XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(report),'Summary');
- XLSX.writeFile(wb,'Saini_Trading_GatePass_Data.xlsx');
-}
-function clearData(){alert('सुरक्षा के लिए यहाँ से केवल स्क्रीन का डेटा साफ नहीं किया जा सकता। Firebase का रिकॉर्ड डिलीट करने के लिए अलग पुष्टि वाला विकल्प चाहिए।');return;rows=[];headers=[];originalRows=[];document.getElementById('tbody').innerHTML='<tr><td colspan="10" style="text-align:center;padding:25px">पहले Excel फाइल अपलोड करें।</td></tr>';document.getElementById('status').textContent='डेटा साफ कर दिया गया।';document.getElementById('search').value='';document.getElementById('dateFilter').value='';buildVillages();render()}
-firebase.auth().onAuthStateChanged(user=>{ if(user) loadFirebaseRecords(); });
-window.addEventListener('online',()=>{if(!firebaseReady)loadFirebaseRecords();});
-if (firebase.auth().currentUser) loadFirebaseRecords();
+firebase.auth().onAuthStateChanged(user=>{
+ if(user)loadFirebaseRecords();
+});
+if(firebase.auth().currentUser)loadFirebaseRecords();
 </script>
-</body></html>
+</body>
+</html>
