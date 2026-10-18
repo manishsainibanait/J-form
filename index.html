@@ -488,7 +488,17 @@ function formatName(nameStr) {
 function getCustomer(r) { return formatName(field(r, ["Customer Name", "Customer", "Farmer Name", "Name", "Kisan Name", "किसान नाम", "किसान का नाम"])); }
 function getVillage(r) { return String(field(r, ["Village", "Village Name", "गाँव", "गांव"]) ?? ""); }
 function getMobile(r) { return String(field(r, ["Mobile No.", "Mobile No", "Mobile", "Phone", "Mobile Number"]) ?? ""); }
-function getGatepass(r) { return String(field(r, ["Gatepass No.", "Gatepass No", "Gate Pass No", "Gatepass", "GP No"]) ?? "").trim(); }
+function getGatepass(r) {
+  return String(field(r, [
+    "GatePass Number",
+    "Gate Pass Number",
+    "Gatepass No.",
+    "Gatepass No",
+    "Gate Pass No",
+    "Gatepass",
+    "GP No"
+  ]) ?? "").trim();
+}
 function getSeason(r) { return String(field(r, ["Season Year", "Season", "SeasonYear", "सीज़न"]) ?? "").trim(); }
 function getCrop(r) { return String(field(r, ["Crop", "Crop Name", "फसल"]) ?? "").trim(); }
 function getRawQty(r) { return field(r, ["Gatepass Qty", "Gate Pass Qty", "Qty", "Quantity", "Qtl", "Quintal", "Net Qty", "क्विंटल"]); }
