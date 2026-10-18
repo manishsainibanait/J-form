@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -95,7 +95,8 @@ th.col-name, td.col-name {
   background: #ffffff;
   z-index: 3;
   min-width: 150px;
-  font-weight: 600;
+  font-weight: 800;
+  color: #000000;
   border-right: 2px solid #94a3b8;
   text-transform: capitalize;
 }
@@ -905,6 +906,7 @@ function render() {
 
       if (idx === 0 || norm(c.title).includes("customer") || norm(c.title).includes("farmer") || norm(c.title) === "name") {
         value = formatName(value);
+        td.style.fontWeight = "800";
       }
 
       if (norm(c.title) === "date") {
@@ -1589,3 +1591,4 @@ startFirebase();
 </script>
 </body>
 </html>
+```
