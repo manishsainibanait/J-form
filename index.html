@@ -1,437 +1,1591 @@
+```html
 <!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Saini Trading Company - Gate Pass App</title>
+<title>Saini Trading Company - Gate Pass Management</title>
+
+<!-- External Libraries -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <style>
-:root{--navy:#102a43;--blue:#1769aa;--teal:#0f9d8a;--bg:#f2f6fb;--ink:#172b4d}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--ink)}
-header{background:linear-gradient(120deg,#102a43,#1769aa);color:white;padding:20px 15px;text-align:center}
-header h1{font-size:23px;margin:0 0 5px}
-header p{margin:0;font-size:13px}
-main{max-width:1200px;margin:auto;padding:14px}
-.panel{background:white;border-radius:14px;padding:15px;margin-bottom:14px;box-shadow:0 3px 14px #17324d12}
-.upload{border:2px dashed #91b7d7;background:#f8fbff}
-input,select,button{font:inherit;border-radius:9px;padding:11px;border:1px solid #cbd5e1;max-width:100%}
-input[type=file]{width:100%;background:white;margin:10px 0}
-button{border:0;background:var(--blue);color:white;font-weight:700;cursor:pointer;margin:3px}
-button.green{background:var(--teal)}
-button.dark{background:var(--navy)}
-button.light{background:#e6eef7;color:var(--navy)}
-button:disabled{opacity:.6}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.note{font-size:13px;color:#64748b;line-height:1.6}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.stat{background:white;padding:14px;border-radius:13px;border-top:4px solid var(--blue);min-width:0}
-.stat:nth-child(2){border-color:var(--teal)}
-.stat:nth-child(3){border-color:#f59e0b}
-.stat:nth-child(4){border-color:#7c3aed}
-.stat small{display:block;color:#64748b}
-.stat strong{display:block;font-size:23px;margin-top:7px;overflow-wrap:anywhere}
-.manual-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
-.manual-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
-.manual-grid input{width:100%;min-width:0;font-weight:400}
-.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
-.filters input,.filters select{width:100%}
-.tablewrap{overflow:auto;max-height:65vh;border:1px solid #e2e8f0;border-radius:10px}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1050px;background:white}
-th,td{padding:10px 9px;border-bottom:1px solid #e7edf4;text-align:left;font-size:13px;white-space:nowrap}
-th{background:#eaf2fa;position:sticky;top:0;z-index:2}
-th.name-freeze,td.name-freeze{position:sticky;left:0;min-width:155px;background:white;z-index:3;box-shadow:2px 0 4px #102a4318}
-th.name-freeze{top:0;background:#dff3fb;z-index:4}
-.badge{background:#e0f2fe;color:#075985;padding:4px 7px;border-radius:20px;font-weight:bold}
-@media(max-width:650px){
- header h1{font-size:20px}
- .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
- .manual-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .filters{grid-template-columns:1fr}
- main{padding:10px}
- .panel{padding:12px}
+:root {
+  --primary: #0f172a;
+  --brand: #1e40af;
+  --bg: #f1f5f9;
+  --card-bg: #ffffff;
+  --border: #cbd5e1;
+  --text: #0f172a;
+  --muted: #64748b;
+  --green: #15803d;
+  --red: #b91c1c;
+  --purple: #7e22ce;
+  --orange: #c2410c;
 }
+
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--text); font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size:13px;}
+
+header{background: linear-gradient(135deg, #0f172a, #1e3a8a); color:white; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;}
+header h2{font-size:16px; font-weight:700;}
+header p{font-size:11px; opacity:0.8;}
+
+.container{max-width:100%; padding:8px;}
+
+/* Compact Cards Layout */
+.top-section{display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:8px; margin-bottom:8px;}
+.card{background:var(--card-bg); border-radius:8px; padding:10px; border:1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+.card h3{font-size:13px; font-weight:700; color:var(--brand); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;}
+
+input, select{width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:12px; outline:none;}
+input:focus, select:focus{border-color:var(--brand);}
+label{display:block; font-size:10px; font-weight:700; color:var(--muted); margin-bottom:2px; text-transform:uppercase;}
+
+button{border:0; border-radius:6px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; color:white; background:var(--brand); transition:0.2s;}
+button:hover{opacity:0.9;}
+button:disabled{opacity:0.4; cursor:not-allowed;}
+.green{background:var(--green);}
+.red{background:var(--red);}
+.purple{background:var(--purple);}
+.gray{background:#475569;}
+.orange{background:var(--orange);}
+
+.actions{display:flex; flex-wrap:wrap; gap:6px;}
+.status{background:#eff6ff; color:#1e40af; padding:6px 8px; border-radius:6px; margin-top:6px; font-size:11px; border:1px solid #bfdbfe;}
+
+/* Stats Counters */
+.stats-grid{display:grid; grid-template-columns: repeat(5, 1fr); gap:6px; text-align:center;}
+.stat-box{background:#f8fafc; border:1px solid var(--border); padding:6px; border-radius:6px;}
+.stat-box small{display:block; font-size:10px; color:var(--muted); font-weight:600;}
+.stat-box strong{font-size:14px; font-weight:800; color:var(--primary);}
+
+.filter-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:6px;}
+
+/* Table CSS */
+.tablewrap{
+  overflow: auto;
+  max-height: 65vh;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: white;
+}
+table{border-collapse:separate; border-spacing:0; width:100%; font-size:12px; white-space:nowrap;}
+th, td{padding:7px 10px; border-bottom:1px solid #e2e8f0; text-align:left;}
+
+th{position:sticky; top:0; background:#e2e8f0; color:var(--primary); font-weight:700; z-index:2;}
+
+th.col-cb, td.col-cb {
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 3;
+  width: 35px;
+  min-width: 35px;
+  border-right: 1px solid #cbd5e1;
+  text-align: center;
+}
+
+th.col-name, td.col-name {
+  position: sticky;
+  left: 35px;
+  background: #ffffff;
+  z-index: 3;
+  min-width: 150px;
+  font-weight: 600;
+  border-right: 2px solid #94a3b8;
+  text-transform: capitalize;
+}
+
+th.col-cb, th.col-name {
+  background: #cbd5e1;
+  z-index: 4;
+}
+
+th.col-date, td.col-date {
+  max-width: 95px;
+  min-width: 95px;
+  width: 95px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* STREAMING_CHUNK:Styling badges, modals, and print media rules... -->
+.badge-season {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 11px;
+}
+.badge-crop {
+  background: #fef3c7;
+  color: #b45309;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 11px;
+}
+.badge-none {
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+tfoot tr {
+  position: sticky;
+  bottom: 0;
+  background: #e2e8f0;
+  font-weight: bold;
+  z-index: 3;
+}
+tfoot td {
+  border-top: 2px solid var(--primary);
+  background: #e2e8f0;
+  padding: 8px 10px;
+}
+
+tr:hover td{background-color: #f1f5f9;}
+tr:hover td.col-cb, tr:hover td.col-name{background-color: #e2e8f0;}
+
+td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor:pointer;}
+.empty{text-align:center; padding:20px; color:var(--muted);}
+#busy{display:none; padding:6px; color:var(--brand); font-weight:bold; font-size:12px;}
+
+/* Custom Modal UI */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  align-items: center; justify-content: center;
+}
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  width: 92%;
+  max-width: 520px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.modal-header h3 { font-size: 15px; color: var(--primary); }
+.close-modal { font-size: 20px; cursor: pointer; color: var(--muted); font-weight: bold; padding: 0 4px; }
+.manage-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; margin-top: 8px; }
+.manage-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-bottom: 1px solid #f1f5f9; gap:8px; flex-wrap: wrap;}
+.manage-item:last-child { border-bottom: none; }
+
+#msgBox {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--primary);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 2000;
+  font-weight: 600;
+}
+
 @media print{
- .no-print,button,.upload{display:none!important}
- .tablewrap{max-height:none;overflow:visible}
- table{min-width:0}
- th,td{font-size:9px;padding:5px;white-space:normal}
+ header, .no-print, .top-section, .modal{display:none!important}
+ body{background:white}
+ .container{padding:0}
+ .tablewrap{overflow:visible; max-height:none; border:none;}
+ table{font-size:10px;}
+ th, td{position:static!important; padding:3px; border-color:#000;}
 }
 </style>
 </head>
+
 <body>
+
 <header>
-<h1>SAINI TRADING COMPANY</h1>
-<p>Gate Pass Excel Manager • डेटा अपलोड, सर्च और कुल हिसाब</p>
+  <h2>SAINI TRADING COMPANY</h2>
+  <p>Gate Pass System - 2026 Edition</p>
 </header>
-<main>
 
-<section class="panel upload no-print">
-<h3>📁 Excel शीट अपलोड करें</h3>
-<p class="note">पहली शीट की पहली लाइन में कॉलम के नाम होने चाहिए। डेटा Firebase में सेव होगा।</p>
-<input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
-<div class="row">
-<button onclick="document.getElementById('fileInput').click()">Excel चुनें / अपलोड करें</button>
-<button class="green" onclick="exportExcel()">⬇ Excel डाउनलोड करें</button>
-<button class="dark" onclick="window.print()">🖨 प्रिंट करें</button>
-</div>
-<div class="row" style="margin-top:10px">
-<label>1 बोरे का वजन (किलो):
-<input id="bagWeight" type="number" min="1" step="0.1" value="37.5" style="width:100px" onchange="render()">
-</label>
-</div>
-<div id="status" class="note">Firebase से कनेक्ट हो रहा है…</div>
-</section>
+<div class="container">
 
-<section class="panel no-print">
-<h3>✍️ मैनुअल एंट्री डालें</h3>
-<p class="note">एक रिकॉर्ड भरकर Firebase में सेव करें।</p>
-<div class="manual-grid">
-<label>तारीख<input id="mDate" type="date"></label>
-<label>ग्राहक का नाम *<input id="mName" placeholder="ग्राहक का नाम"></label>
-<label>गाँव / पता<input id="mVillage" placeholder="गाँव"></label>
-<label>मोबाइल<input id="mMobile" type="tel" placeholder="मोबाइल नंबर"></label>
-<label>Gate Pass नंबर *<input id="mGatepass" placeholder="Gate Pass नंबर"></label>
-<label>Qty (क्विंटल) *<input id="mQty" type="number" min="0" step="0.01" placeholder="जैसे 12.50"></label>
-<label>मंडी<input id="mMandi" placeholder="मंडी"></label>
-<label>स्थिति<input id="mStatus" placeholder="स्थिति"></label>
-</div>
-<div class="row" style="margin-top:10px">
-<button class="green" id="manualSaveBtn" onclick="saveManualEntry()">Firebase में सेव करें</button>
-<button class="light" onclick="resetManualForm()">फॉर्म साफ करें</button>
-</div>
-<div id="manualStatus" class="note">पहले एक एंट्री भरें।</div>
-</section>
+  <!-- Top Dashboard Controls -->
+  <div class="top-section no-print">
 
-<section class="stats">
-<div class="stat"><small>कुल एंट्री</small><strong id="totalEntries">0</strong></div>
-<div class="stat"><small>कुल क्विंटल / Qty</small><strong id="totalBore">0</strong></div>
-<div class="stat"><small>कुल बोरे</small><strong id="totalQtl">0.00</strong></div>
-<div class="stat"><small>दिख रही एंट्री</small><strong id="visibleEntries">0</strong></div>
-</section>
+    <!-- Card 1: Upload, Season & Crop Selection -->
+    <div class="card">
+      <h3>📂 Excel Upload <button class="gray" id="refreshBtn" style="padding:2px 6px; font-size:10px;">🔄 Sync</button></h3>
+      
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+        <div>
+          <label>सीज़न (Season)</label>
+          <select id="uploadSeasonSelect"></select>
+        </div>
+        <div>
+          <label>फसल (Crop)</label>
+          <select id="uploadCropSelect"></select>
+        </div>
+      </div>
 
-<section class="panel">
-<div class="filters no-print">
-<input id="search" placeholder="🔎 नाम, गाँव, मोबाइल, Gate Pass खोजें..." oninput="render()">
-<input id="dateFilter" type="date" onchange="render()">
-<select id="villageFilter" onchange="render()"><option value="">सभी गाँव</option></select>
+      <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="padding:3px;">
+        <button id="uploadBtn" class="green" style="white-space:nowrap;">⬆️ Upload</button>
+      </div>
+
+      <div class="actions">
+        <button id="exportBtn" class="purple">⬇️ Export</button>
+        <button id="printBtn" class="gray">🖨️ Print</button>
+        <button id="manageMasterBtn" class="orange">⚙️ Season & Crop Manage</button>
+      </div>
+      <div id="uploadStatus" class="status">फाइल चुनें...</div>
+    </div>
+
+    <!-- Card 2: Stats -->
+    <div class="card">
+      <h3>📊 कुल हिसाब <span id="currentCropBadge" style="font-size:11px; color:var(--brand); font-weight:normal;"></span></h3>
+      <div class="stats-grid">
+        <div class="stat-box"><small>कुल डेटा</small><strong id="totalRows">0</strong></div>
+        <div class="stat-box"><small>दिख रहे</small><strong id="visibleRows">0</strong></div>
+        <div class="stat-box"><small>क्विंटल</small><strong id="totalQty" style="color:var(--green)">0</strong></div>
+        <div class="stat-box"><small>बोरे</small><strong id="totalBore" style="color:var(--purple)">0</strong></div>
+        <div class="stat-box"><small>चुने</small><strong id="selectedRows" style="color:var(--red)">0</strong></div>
+      </div>
+      <div id="connection" class="status" style="margin-top:8px;">कनेक्ट हो रहा है...</div>
+    </div>
+
+    <!-- Card 3: Filters -->
+    <div class="card">
+      <h3>🔍 फिल्टर और सर्च</h3>
+      <div class="filter-grid">
+        <div>
+          <label>सर्च</label>
+          <input id="search" placeholder="नाम / गाँव / GP">
+        </div>
+        <div>
+          <label>सीज़न</label>
+          <select id="seasonFilter"><option value="">सभी सीज़न</option></select>
+        </div>
+        <div>
+          <label>फसल</label>
+          <select id="cropFilter"><option value="">सभी फसलें</option></select>
+        </div>
+        <div>
+          <label>गाँव</label>
+          <select id="villageFilter"><option value="">सभी गाँव</option></select>
+        </div>
+        <div>
+          <label>क्रम</label>
+          <select id="sortOrder">
+            <option value="newest">नया पहले</option>
+            <option value="oldest">पुराना पहले</option>
+            <option value="az">नाम A-Z</option>
+            <option value="za">नाम Z-A</option>
+          </select>
+        </div>
+        <div>
+          <label>तारीख से</label>
+          <input id="fromDate" type="date">
+        </div>
+        <div>
+          <label>तारीख तक</label>
+          <input id="toDate" type="date">
+        </div>
+        <div style="display:flex; align-items:end;">
+          <button id="clearFilters" class="gray" style="width:100%; padding:6px;">Clear Filter</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Table Card -->
+  <div class="card" style="padding:8px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h3 style="margin:0;">📋 Gate Pass रिकॉर्ड</h3>
+      <div class="actions no-print">
+        <button id="selectAllBtn" class="gray" style="padding:4px 8px;">✓ Select All</button>
+        <button id="unselectBtn" class="gray" style="padding:4px 8px;">✗ Clear</button>
+        <button id="deleteBtn" class="red" style="padding:4px 8px;">🗑️ Delete Selected</button>
+      </div>
+    </div>
+
+    <div id="busy">⌛ प्रोसेस हो रहा है...</div>
+
+    <div class="tablewrap">
+      <table>
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody">
+          <tr><td class="empty">डेटा लोड हो रहा है...</td></tr>
+        </tbody>
+        <tfoot id="tableFoot"></tfoot>
+      </table>
+    </div>
+  </div>
+
 </div>
-<div class="row" style="justify-content:space-between;margin:12px 0">
-<strong>Gate Pass रिकॉर्ड</strong>
-<span class="note">नाम बाईं ओर फ्रीज़ रहेगा • टेबल साइड में स्क्रॉल होगी।</span>
+
+<!-- Modal: Season & Crop Management -->
+<div id="masterModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>⚙️ Season & Crop Management</h3>
+      <span class="close-modal" id="closeMasterModal">&times;</span>
+    </div>
+
+    <!-- Season Section -->
+    <div style="margin-bottom:16px;">
+      <h4 style="font-size:12px; margin-bottom:6px; color:var(--brand);">1. Manage Season Year (जैसे 2026)</h4>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="newSeasonInput" placeholder="Season Year (e.g. 2026)">
+        <button type="button" id="addSeasonBtn" class="green">Add</button>
+      </div>
+      <div class="manage-list" id="seasonList"></div>
+    </div>
+
+    <!-- Crop Section -->
+    <div>
+      <h4 style="font-size:12px; margin-bottom:6px; color:var(--brand);">2. Manage Crop & Bore Weight (Kg me)</h4>
+      <div style="display:grid; grid-template-columns: 2fr 1.5fr auto; gap:6px; margin-bottom:6px;">
+        <input type="text" id="newCropInput" placeholder="Crop Name (e.g. Wheat)">
+        <input type="number" id="newCropWeightInput" placeholder="Bore Wt (Kg)" value="50" step="0.1">
+        <button type="button" id="addCropBtn" class="green">Add</button>
+      </div>
+      <div class="manage-list" id="cropList"></div>
+    </div>
+  </div>
 </div>
-<div class="tablewrap">
-<table>
-<thead>
-<tr>
-<th class="name-freeze">ग्राहक का नाम</th><th>#</th><th>तारीख</th>
-<th>गाँव / पता</th><th>मोबाइल</th><th>Gate Pass नंबर</th>
-<th>Qty (क्विंटल)</th><th>बोरे</th><th>मंडी</th><th>स्थिति</th>
-</tr>
-</thead>
-<tbody id="tbody">
-<tr><td colspan="10">पहले Excel फाइल अपलोड करें।</td></tr>
-</tbody>
-</table>
+
+<!-- Modal: Delete Confirmation -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content" style="max-width:380px; text-align:center;">
+    <h3 style="color:var(--red); margin-bottom:10px;">🗑️ Delete Records</h3>
+    <p id="deleteConfirmText" style="margin-bottom:16px; font-weight:600; font-size:13px;"></p>
+    <div style="display:flex; justify-content:center; gap:10px;">
+      <button id="confirmDeleteBtn" class="red" style="padding:8px 16px;">Yes, Delete</button>
+      <button id="cancelDeleteBtn" class="gray" style="padding:8px 16px;">Cancel</button>
+    </div>
+  </div>
 </div>
-</section>
-</main>
+
+<div id="msgBox"></div>
 
 <script>
-let rows=[];
-let headers=[];
-
-const firebaseConfig={
- apiKey:"AIzaSyDZcOc-H9DUGPj_5euImVr8QGMBvyhv8LA",
- authDomain:"jform-5b6fa.firebaseapp.com",
- databaseURL:"https://jform-5b6fa-default-rtdb.asia-southeast1.firebasedatabase.app",
- projectId:"jform-5b6fa",
- storageBucket:"jform-5b6fa.firebasestorage.app",
- messagingSenderId:"105469766353",
- appId:"1:105469766353:web:817db55469edd27d1a73f0"
+const firebaseConfig = {
+  apiKey: "AIzaSyDZcOc-H9DUGPj_5euImVr8QGMBvyhv8LA",
+  authDomain: "jform-5b6fa.firebaseapp.com",
+  databaseURL: "https://jform-5b6fa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "jform-5b6fa",
+  storageBucket: "jform-5b6fa.firebasestorage.app",
+  messagingSenderId: "105469766353",
+  appId: "1:105469766353:web:817db55469edd27d1a73f0"
 };
 
-let gatePassRef=null;
+const DB_PATH = "gatePassExcelRecords";
+const MASTER_PATH = "gatePassMasterData";
+const LOCAL_MASTER_KEY = "saini_gatepass_master_v1";
 
-try{
- if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
- gatePassRef=firebase.database().ref("gatePassExcelRecords");
-}catch(e){
- console.error(e);
- setStatus("Firebase शुरू नहीं हुआ: "+e.message);
-}
+let db, auth, recordsRef, masterRef;
+let records = [];
 
-/* Firebase में . # $ / [ ] और control characters key में नहीं हो सकते */
-function safeFirebaseRecord(record){
- const safe={};
- for(const [rawKey,value] of Object.entries(record||{})){
-  let key=String(rawKey??"")
-   .replace(/[.#$\/\[\]\u0000-\u001F\u007F]/g,"_")
-   .trim();
-  if(!key)key="field";
-  let finalKey=key,n=2;
-  while(Object.prototype.hasOwnProperty.call(safe,finalKey)){
-   finalKey=key+"_"+n++;
-  }
-  safe[finalKey]=value;
- }
- return safe;
-}
-
-const aliases={
- date:["Date","तारीख","दिनांक"],
- name:["Farmer Name","Customer Name","Name","ग्राहक का नाम","किसान का नाम"],
- village:["Village","गाँव","गांव","Address"],
- mobile:["Mobile No.","Mobile No_","Mobile No","Mobile","Phone","मोबाइल"],
- gatepass:["GatePass Number","Gate Pass Number","Gatepass No","Gate Pass","गेट पास नंबर"],
- qty:["Gatepass Qty","Gate Pass Qty","Qty","Quantity","Bore","बोरे"],
- mandi:["Mandi Name","मंडी"],
- status:["Status","स्थिति"]
+let masterData = {
+  seasons: ["2026", "2025"],
+  crops: [
+    { name: "Wheat", weightKg: 50 },
+    { name: "Mustard", weightKg: 50 },
+    { name: "Paddy", weightKg: 37.5 },
+    { name: "Gram", weightKg: 50 }
+  ]
 };
 
-function norm(v){
- return String(v??"").trim().toLowerCase().replace(/[\s_-]/g,"");
-}
-function findKey(obj,names){
- const keys=Object.keys(obj);
- for(const n of names){
-  const k=keys.find(x=>norm(x)===norm(n));
-  if(k!==undefined)return k;
- }
- return null;
-}
-function val(r,field){
- const k=findKey(r,aliases[field]||[]);
- return k===null?"":r[k]??"";
-}
-function num(v){
- const n=parseFloat(String(v??"").replace(/,/g,""));
- return Number.isFinite(n)?n:0;
-}
-function esc(s){
- return String(s??"").replace(/[&<>"']/g,c=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
- }[c]));
-}
-function setStatus(s){
- document.getElementById("status").textContent=s;
-}
-function manualStatus(s){
- document.getElementById("manualStatus").textContent=s;
-}
-function recordKey(r){
- const gp=String(val(r,"gatepass")).trim().toLowerCase();
- if(gp)return "GP:"+gp;
- return "ROW:"+["date","name","village","mobile","qty"].map(k=>String(val(r,k)).trim().toLowerCase()).join("|");
-}
-function withTimeout(promise,ms,label){
- let timer;
- return Promise.race([
-  promise,
-  new Promise((_,reject)=>{
-   timer=setTimeout(()=>reject(new Error(label+" में समय अधिक लगा। इंटरनेट जाँचें।")),ms);
-  })
- ]).finally(()=>clearTimeout(timer));
-}
-async function ensureLogin(){
- if(firebase.auth().currentUser)return firebase.auth().currentUser;
- setStatus("Firebase Anonymous Login हो रहा है…");
- await withTimeout(firebase.auth().signInAnonymously(),20000,"Firebase Login");
- if(!firebase.auth().currentUser)throw new Error("Firebase Login पूरा नहीं हुआ।");
- return firebase.auth().currentUser;
+// Load cached masterData from localStorage if available
+try {
+  const savedLocal = localStorage.getItem(LOCAL_MASTER_KEY);
+  if (savedLocal) {
+    const parsed = JSON.parse(savedLocal);
+    if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed.seasons)) masterData.seasons = parsed.seasons.filter(Boolean);
+      if (Array.isArray(parsed.crops)) masterData.crops = parsed.crops;
+    }
+  }
+} catch (err) {
+  console.warn("Local master cache read error:", err);
 }
 
-async function loadFirebaseRecords(){
- try{
-  await ensureLogin();
-  const snap=await withTimeout(gatePassRef.once("value"),15000,"Firebase से रिकॉर्ड पढ़ना");
-  const data=snap.val()||{};
-  rows=Object.values(data).filter(x=>x&&typeof x==="object");
-  headers=[...new Set(rows.flatMap(r=>Object.keys(r)))];
-  buildVillages();
-  render();
-  setStatus("Firebase कनेक्ट है • "+rows.length+" रिकॉर्ड लोड हुए।");
- }catch(e){
-  console.error(e);
-  setStatus("Firebase से कनेक्ट नहीं हुआ: "+(e.code?e.code+" — ":"")+e.message);
- }
+let selectedKeys = new Set();
+let excelRows = [];
+let initialLoadDone = false;
+let busy = false;
+let isEditingMaster = false;
+
+const $ = id => document.getElementById(id);
+
+function showNotice(msg) {
+  const box = $("msgBox");
+  box.textContent = msg;
+  box.style.display = "block";
+  setTimeout(() => { box.style.display = "none"; }, 3000);
 }
 
-function buildVillages(){
- const sel=document.getElementById("villageFilter");
- const old=sel.value;
- const list=[...new Set(rows.map(r=>String(val(r,"village")).trim()).filter(Boolean))].sort();
- sel.innerHTML='<option value="">सभी गाँव</option>'+list.map(v=>'<option>'+esc(v)+'</option>').join("");
- if(list.includes(old))sel.value=old;
+function norm(v) {
+  return String(v ?? "").toLowerCase()
+    .replace(/[\s._\-/#()[\]]/g, "")
+    .replace(/[^a-z0-9\u0900-\u097f]/g, "");
 }
 
-function render(){
- const bw=Math.max(1,num(document.getElementById("bagWeight").value));
- const q=document.getElementById("search").value.trim().toLowerCase();
- const dt=document.getElementById("dateFilter").value;
- const village=document.getElementById("villageFilter").value;
-
- const filtered=rows.filter(r=>{
-  const hay=[val(r,"name"),val(r,"village"),val(r,"mobile"),val(r,"gatepass")].join(" ").toLowerCase();
-  return (!q||hay.includes(q))&&(!dt||String(val(r,"date")).slice(0,10)===dt)&&(!village||String(val(r,"village"))===village);
- });
-
- const total=rows.reduce((s,r)=>s+num(val(r,"qty")),0);
- document.getElementById("totalEntries").textContent=rows.length;
- document.getElementById("totalBore").textContent=total.toLocaleString("en-IN",{maximumFractionDigits:2});
- document.getElementById("totalQtl").textContent=(total*100/bw).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
- document.getElementById("visibleEntries").textContent=filtered.length;
-
- document.getElementById("tbody").innerHTML=filtered.length?filtered.map((r,i)=>`
- <tr>
- <td class="name-freeze"><b>${esc(val(r,"name"))}</b></td>
- <td>${i+1}</td><td>${esc(val(r,"date"))}</td>
- <td>${esc(val(r,"village"))}</td><td>${esc(val(r,"mobile"))}</td>
- <td><span class="badge">${esc(val(r,"gatepass"))}</span></td>
- <td>${num(val(r,"qty")).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
- <td>${(num(val(r,"qty"))*100/bw).toFixed(2)}</td>
- <td>${esc(val(r,"mandi"))}</td><td>${esc(val(r,"status"))}</td>
- </tr>`).join(""):'<tr><td colspan="10" style="text-align:center;padding:25px">कोई रिकॉर्ड नहीं मिला।</td></tr>';
+function safeFieldName(v) {
+  return String(v ?? "").trim()
+    .replace(/[.#$/\[\]]/g, "_")
+    .replace(/[\u0000-\u001F\u007F]/g, "") || "Column";
 }
 
-function resetManualForm(){
- ["mDate","mName","mVillage","mMobile","mGatepass","mQty","mMandi","mStatus"].forEach(id=>document.getElementById(id).value="");
- manualStatus("फॉर्म साफ है।");
+function field(row, names) {
+  const keys = Object.keys(row || {});
+  for (const name of names) {
+    const found = keys.find(k => norm(k) === norm(name));
+    if (found !== undefined) return row[found];
+  }
+  return "";
 }
 
-async function saveManualEntry(){
- const btn=document.getElementById("manualSaveBtn");
- const name=document.getElementById("mName").value.trim();
- const gp=document.getElementById("mGatepass").value.trim();
- const qtyText=document.getElementById("mQty").value.trim();
+function num(v) {
+  if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+  const s = String(v ?? "").replace(/,/g, "").trim();
+  const m = s.match(/-?\d+(\.\d+)?/);
+  return m ? Number(m[0]) : 0;
+}
 
- if(!name||!gp||qtyText===""){
-  manualStatus("ग्राहक का नाम, Gate Pass नंबर और Qty भरें।");
-  return;
- }
- const qty=Number(qtyText);
- if(!Number.isFinite(qty)||qty<0){
-  manualStatus("Qty सही नंबर में भरें।");
-  return;
- }
+function fmt(v, dec = 2) {
+  return num(v).toLocaleString("en-IN", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
 
- const entry={
-  Date:document.getElementById("mDate").value,
-  "Customer Name":name,
-  Village:document.getElementById("mVillage").value.trim(),
-  "Mobile No.":document.getElementById("mMobile").value.trim(),
-  "GatePass Number":gp,
-  "Gatepass Qty":qty,
-  "Mandi Name":document.getElementById("mMandi").value.trim(),
-  Status:document.getElementById("mStatus").value.trim()
- };
+function formatName(nameStr) {
+  if (!nameStr) return "";
+  return String(nameStr)
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
- try{
-  btn.disabled=true;
-  btn.textContent="सेव हो रहा है…";
-  manualStatus("Firebase Login हो रहा है…");
-  await ensureLogin();
+function getCustomer(r) { return formatName(field(r, ["Customer Name", "Customer", "Farmer Name", "Name", "Kisan Name", "किसान नाम", "किसान का नाम"])); }
+function getVillage(r) { return String(field(r, ["Village", "Village Name", "गाँव", "गांव"]) ?? ""); }
+function getMobile(r) { return String(field(r, ["Mobile No.", "Mobile No", "Mobile", "Phone", "Mobile Number"]) ?? ""); }
+function getGatepass(r) { return String(field(r, ["Gatepass No.", "Gatepass No", "Gate Pass No", "Gatepass", "GP No"]) ?? "").trim(); }
+function getSeason(r) { return String(field(r, ["Season Year", "Season", "SeasonYear", "सीज़न"]) ?? ""); }
+function getCrop(r) { return String(field(r, ["Crop", "Crop Name", "फसल"]) ?? ""); }
+function getRawQty(r) { return field(r, ["Gatepass Qty", "Gate Pass Qty", "Qty", "Quantity", "Qtl", "Quintal", "Net Qty", "क्विंटल"]); }
+function getRawBore(r) { return field(r, ["Bore", "Bores", "Bags", "Bag", "Bora", "Total Bags", "बोरे"]); }
 
-  const snap=await withTimeout(gatePassRef.once("value"),15000,"Firebase से रिकॉर्ड पढ़ना");
-  const saved=snap.val()||{};
-  const existing=Object.values(saved).filter(x=>x&&typeof x==="object");
+function isoDate(v) {
+  if (!v) return "";
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,"0")}-${String(v.getDate()).padStart(2,"0")}`;
+  }
+  if (typeof v === "number" && v > 20000 && v < 90000) {
+    const d = XLSX.SSF.parse_date_code(v);
+    if (d) return `${d.y}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`;
+  }
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  m = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})$/);
+  if (m) {
+    let y = m[3].length === 2 ? (Number(m[3]) > 50 ? "19"+m[3] : "20"+m[3]) : m[3];
+    return `${y}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+  }
+  return s;
+}
 
-  if(existing.some(r=>String(val(r,"gatepass")).trim().toLowerCase()===gp.toLowerCase())){
-   manualStatus("यह Gate Pass नंबर पहले से मौजूद है। डुप्लीकेट सेव नहीं किया।");
-   return;
+function shortDate(v) {
+  const iso = isoDate(v);
+  if (!iso || !iso.includes("-")) return String(v || "");
+  const parts = iso.split("-");
+  return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}` : iso;
+}
+
+function getDate(r) { return isoDate(field(r, ["Date", "Gatepass Date", "Gate Pass Date", "J Form Date", "दिनांक"])); }
+
+function identity(r) {
+  const gp = norm(getGatepass(r));
+  const season = norm(getSeason(r));
+  const crop = norm(getCrop(r));
+  if (gp) return "GP:" + gp + "|S:" + season + "|C:" + crop;
+  return "ROW:" + [norm(getDate(r)), norm(getCustomer(r)), norm(getVillage(r)), norm(getMobile(r)), norm(getRawQty(r)), norm(getRawBore(r)), season, crop].join("|");
+}
+
+function setConnection(msg, error=false) {
+  $("connection").textContent = msg;
+  $("connection").style.background = error ? "#fef2f2" : "#eff6ff";
+  $("connection").style.color = error ? "#991b1b" : "#1e40af";
+}
+
+function setUpload(msg, error=false) {
+  $("uploadStatus").textContent = msg;
+  $("uploadStatus").style.background = error ? "#fef2f2" : "#eff6ff";
+  $("uploadStatus").style.color = error ? "#991b1b" : "#1e40af";
+}
+
+function setBusy(v) {
+  busy = v;
+  $("busy").style.display = v ? "block" : "none";
+  $("uploadBtn").disabled = v;
+  $("deleteBtn").disabled = v;
+}
+
+async function startFirebase() {
+  updateMasterDropdowns();
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.database();
+    recordsRef = db.ref(DB_PATH);
+    masterRef = db.ref(MASTER_PATH);
+
+    if (!auth.currentUser) await auth.signInAnonymously();
+
+    listenMasterData();
+    listenRecords();
+    setConnection("🟢 Firebase Connected");
+  } catch (e) {
+    setConnection("❌ Conn Error: " + (e.message || e), true);
+  }
+}
+
+function normalizeMasterCrops(crops) {
+  if (!crops) return [];
+  const arr = Array.isArray(crops) ? crops : Object.values(crops);
+  return arr.map(c => {
+    if (typeof c === "string") return { name: c.trim(), weightKg: 50 };
+    if (c && typeof c === "object") return { name: String(c.name || "").trim(), weightKg: Number(c.weightKg) || 50 };
+    return { name: "", weightKg: 50 };
+  }).filter(c => c.name && c.name !== "undefined");
+}
+
+function normalizeMasterSeasons(seasons) {
+  if (!seasons) return [];
+  const arr = Array.isArray(seasons) ? seasons : Object.values(seasons);
+  return arr.map(s => String(s ?? "").trim()).filter(Boolean);
+}
+
+async function saveMasterData() {
+  const payload = {
+    seasons: masterData.seasons,
+    crops: masterData.crops,
+    updatedAt: Date.now()
+  };
+  try {
+    localStorage.setItem(LOCAL_MASTER_KEY, JSON.stringify(payload));
+  } catch (e) {
+    console.warn("Local storage save error:", e);
+  }
+  updateMasterDropdowns();
+  renderMasterModalLists();
+  if (initialLoadDone) render();
+
+  if (masterRef) {
+    try {
+      await masterRef.set(payload);
+    } catch (e) {
+      console.warn("Master Firebase sync fallback:", e);
+    }
+  }
+}
+
+function listenMasterData() {
+  masterRef.on("value", snapshot => {
+    const val = snapshot.val();
+    if (val && typeof val === "object") {
+      if (val.updatedAt) {
+        masterData.seasons = normalizeMasterSeasons(val.seasons);
+        masterData.crops = normalizeMasterCrops(val.crops);
+      } else {
+        masterData.seasons = val.seasons ? normalizeMasterSeasons(val.seasons) : masterData.seasons;
+        masterData.crops = val.crops ? normalizeMasterCrops(val.crops) : masterData.crops;
+      }
+      try {
+        localStorage.setItem(LOCAL_MASTER_KEY, JSON.stringify(masterData));
+      } catch (e) {}
+    } else {
+      saveMasterData();
+    }
+    updateMasterDropdowns();
+    if ($("masterModal").style.display === "flex" && !isEditingMaster) {
+      renderMasterModalLists();
+    }
+    if (initialLoadDone) render();
+  });
+}
+
+function updateMasterDropdowns() {
+  const uploadSeason = $("uploadSeasonSelect");
+  const filterSeason = $("seasonFilter");
+  const curUploadS = uploadSeason.value;
+  const curFilterS = filterSeason.value;
+
+  uploadSeason.innerHTML = masterData.seasons.map(s => `<option value="${s}">${s}</option>`).join("");
+  filterSeason.innerHTML = '<option value="">सभी सीज़न</option>' +
+    masterData.seasons.map(s => `<option value="${s}">${s}</option>`).join("") +
+    '<option value="__UNASSIGNED__">Unassigned (पुराना डेटा)</option>';
+
+  if (curUploadS && masterData.seasons.includes(curUploadS)) uploadSeason.value = curUploadS;
+  if (curFilterS && (curFilterS === "__UNASSIGNED__" || masterData.seasons.includes(curFilterS))) {
+    filterSeason.value = curFilterS;
+  } else {
+    filterSeason.value = "";
   }
 
-  manualStatus("Firebase में रिकॉर्ड सेव हो रहा है…");
-  const ref=gatePassRef.push();
-  await withTimeout(ref.set(safeFirebaseRecord(entry)),15000,"Firebase में डेटा सेव करना");
+  const uploadCrop = $("uploadCropSelect");
+  const filterCrop = $("cropFilter");
+  const curUploadC = uploadCrop.value;
+  const curFilterC = filterCrop.value;
 
-  const verify=await withTimeout(ref.once("value"),15000,"सेव हुआ डेटा जाँचना");
-  if(!verify.exists())throw new Error("सेव के बाद रिकॉर्ड नहीं मिला।");
+  uploadCrop.innerHTML = masterData.crops.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+  filterCrop.innerHTML = '<option value="">सभी फसलें</option>' +
+    masterData.crops.map(c => `<option value="${c.name}">${c.name}</option>`).join("") +
+    '<option value="__UNASSIGNED__">Unassigned (पुराना डेटा)</option>';
 
-  rows=existing.concat([entry]);
-  headers=[...new Set(rows.flatMap(r=>Object.keys(r)))];
-  buildVillages();
-  render();
-  manualStatus("✅ सफल! Gate Pass "+gp+" Firebase में सेव हो गया।");
-
-  resetManualForm();
-  setStatus("Firebase कनेक्ट है • "+rows.length+" रिकॉर्ड उपलब्ध।");
- }catch(e){
-  console.error(e);
-  manualStatus("❌ सेव नहीं हुआ: "+(e.code?e.code+" — ":"")+e.message);
- }finally{
-  btn.disabled=false;
-  btn.textContent="Firebase में सेव करें";
- }
+  if (curUploadC && masterData.crops.some(c => c.name === curUploadC)) uploadCrop.value = curUploadC;
+  if (curFilterC && (curFilterC === "__UNASSIGNED__" || masterData.crops.some(c => c.name === curFilterC))) {
+    filterCrop.value = curFilterC;
+  } else {
+    filterCrop.value = "";
+  }
 }
 
-document.getElementById("fileInput").addEventListener("change",async e=>{
- const file=e.target.files[0];
- if(!file)return;
+function listenRecords() {
+  recordsRef.off("value");
+  recordsRef.on("value", snapshot => {
+    const data = snapshot.val() || {};
+    records = Object.entries(data).map(([key,value]) => ({
+      key,
+      data: value && typeof value === "object" ? value : {}
+    }));
+    selectedKeys = new Set([...selectedKeys].filter(k => records.some(r => r.key === k)));
+    initialLoadDone = true;
+    setConnection("🟢 Firebase Online (" + records.length + " Rows)");
+    render();
+  }, e => setConnection("❌ Load Error: " + e.message, true));
+}
 
- try{
-  if(!window.XLSX)throw new Error("Excel लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचें।");
-  setStatus("Excel पढ़ी जा रही है…");
-  await ensureLogin();
+function getCropWeight(cropName) {
+  if (!cropName) return 50;
+  const found = masterData.crops.find(c => norm(c.name) === norm(cropName));
+  return found && found.weightKg ? Number(found.weightKg) : 50;
+}
 
-  const buffer=await file.arrayBuffer();
-  const wb=XLSX.read(buffer,{type:"array",cellDates:true});
-  const ws=wb.Sheets[wb.SheetNames[0]];
-  const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:false});
-  if(matrix.length<2)throw new Error("Excel में डेटा नहीं मिला।");
+/* STRICT SINGLE QUANTITY CALCULATOR - PREVENTS DOUBLE COUNTING */
+function getCalculatedValues(r) {
+  const rawQ = String(getRawQty(r.data) ?? "").trim();
+  const rawB = String(getRawBore(r.data) ?? "").trim();
 
-  const excelHeaders=matrix[0].map((h,i)=>String(h||("Column "+(i+1))).trim());
-  const incoming=matrix.slice(1)
-   .filter(r=>r.some(c=>String(c??"").trim()!==""))
-   .map(r=>{
-    const o={};
-    excelHeaders.forEach((h,i)=>o[h]=r[i]??"");
-    return o;
-   });
+  let q = 0;
+  let b = 0;
 
-  const snap=await withTimeout(gatePassRef.once("value"),15000,"Firebase से रिकॉर्ड पढ़ना");
-  const data=snap.val()||{};
-  const existing=Object.values(data).filter(x=>x&&typeof x==="object");
-  const seen=new Set(existing.map(recordKey));
-  let saved=0,skipped=0;
-
-  for(const r of incoming){
-   const key=recordKey(r);
-   if(seen.has(key)){skipped++;continue;}
-   seen.add(key);
-   setStatus("Firebase में सेव हो रहा है… "+(saved+1));
-   await withTimeout(gatePassRef.push().set(safeFirebaseRecord(r)),15000,"Firebase में रिकॉर्ड सेव करना");
-   saved++;
+  if (rawQ !== "") {
+    q = num(rawQ);
+    if (rawB !== "") {
+      b = num(rawB);
+    } else {
+      const cropName = getCrop(r.data) || $("cropFilter").value || $("uploadCropSelect").value;
+      const bagWtKg = getCropWeight(cropName);
+      b = Math.round((q * 100) / bagWtKg);
+    }
+  } 
+  else if (rawB !== "") {
+    b = num(rawB);
+    const cropName = getCrop(r.data) || $("cropFilter").value || $("uploadCropSelect").value;
+    const bagWtKg = getCropWeight(cropName);
+    q = (b * bagWtKg) / 100;
   }
 
-  const refreshed=await withTimeout(gatePassRef.once("value"),15000,"अपलोड जाँचना");
-  rows=Object.values(refreshed.val()||{}).filter(x=>x&&typeof x==="object");
-  headers=[...new Set(rows.flatMap(r=>Object.keys(r)))];
-  buildVillages();
-  render();
-  setStatus("✅ अपलोड पूरा। नई एंट्री: "+saved+" • डुप्लीकेट स्किप: "+skipped+" • कुल रिकॉर्ड: "+rows.length);
- }catch(e){
-  console.error(e);
-  setStatus("❌ अपलोड नहीं हुआ: "+(e.code?e.code+" — ":"")+e.message);
- }
-});
-
-function exportExcel(){
- if(!rows.length){alert("पहले रिकॉर्ड लोड करें।");return;}
- const wb=XLSX.utils.book_new();
- const hs=[...new Set(rows.flatMap(r=>Object.keys(r)))];
- const data=[hs,...rows.map(r=>hs.map(h=>r[h]??""))];
- XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(data),"Gate Pass Data");
- XLSX.writeFile(wb,"Saini_Trading_GatePass_Data.xlsx");
+  return { qty: q, bore: b, rawQ, rawB };
 }
 
-firebase.auth().onAuthStateChanged(user=>{
- if(user)loadFirebaseRecords();
+function getFiltered() {
+  const q = norm($("search").value);
+  const season = $("seasonFilter").value;
+  const crop = $("cropFilter").value;
+  const village = $("villageFilter").value;
+  const from = $("fromDate").value;
+  const to = $("toDate").value;
+
+  let list = records.filter(r => {
+    const d = getDate(r.data);
+    const rSeason = getSeason(r.data);
+    const rCrop = getCrop(r.data);
+
+    if (season) {
+      if (season === "__UNASSIGNED__") {
+        if (rSeason) return false;
+      } else if (rSeason && norm(rSeason) !== norm(season)) {
+        return false;
+      }
+    }
+
+    if (crop) {
+      if (crop === "__UNASSIGNED__") {
+        if (rCrop) return false;
+      } else if (rCrop && norm(rCrop) !== norm(crop)) {
+        return false;
+      }
+    }
+
+    if (village && getVillage(r.data) !== village) return false;
+    if (from && (!d || d < from)) return false;
+    if (to && (!d || d > to)) return false;
+    if (q && !norm(Object.values(r.data).join(" ")).includes(q)) return false;
+    return true;
+  });
+
+  const sort = $("sortOrder").value;
+  list.sort((a,b) => {
+    if (sort === "newest") return getDate(b.data).localeCompare(getDate(a.data));
+    if (sort === "oldest") return getDate(a.data).localeCompare(getDate(b.data));
+    if (sort === "az") return getCustomer(a.data).localeCompare(getCustomer(b.data));
+    if (sort === "za") return getCustomer(b.data).localeCompare(getCustomer(a.data));
+    return 0;
+  });
+
+  return list;
+}
+
+function hasValueInColumn(list, colKey, title) {
+  return list.some(r => {
+    let val = r.data[colKey];
+    if (norm(title) === "date") val = isoDate(val);
+    if (val === null || val === undefined) return false;
+    if (typeof val === "number") return val !== 0;
+    return String(val).trim() !== "" && String(val).trim() !== "0";
+  });
+}
+
+function render() {
+  if (!initialLoadDone) return;
+
+  const filtered = getFiltered();
+
+  $("totalRows").textContent = records.length;
+  $("visibleRows").textContent = filtered.length;
+
+  let totalQty = 0;
+  let totalBore = 0;
+
+  filtered.forEach(r => {
+    const calc = getCalculatedValues(r);
+    totalQty += calc.qty;
+    totalBore += calc.bore;
+  });
+
+  $("totalQty").textContent = fmt(totalQty, 2);
+  $("totalBore").textContent = fmt(totalBore, 0);
+  $("selectedRows").textContent = selectedKeys.size;
+
+  const currentCrop = $("cropFilter").value || $("uploadCropSelect").value;
+  $("currentCropBadge").textContent = (currentCrop && currentCrop !== "__UNASSIGNED__") ? `(${currentCrop} - ${getCropWeight(currentCrop)}kg Bag)` : "";
+
+  const villages = [...new Set(records.map(r => getVillage(r.data)).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+  const oldVillage = $("villageFilter").value;
+  $("villageFilter").innerHTML = '<option value="">सभी गाँव</option>';
+  villages.forEach(v => {
+    const op = document.createElement("option");
+    op.value = v; op.textContent = v;
+    $("villageFilter").appendChild(op);
+  });
+  $("villageFilter").value = villages.includes(oldVillage) ? oldVillage : "";
+
+  const allKeys = [...new Set(records.flatMap(r => Object.keys(r.data)))];
+
+  const standard = [
+    {title:"Customer Name", aliases:["Customer Name","Customer","Farmer Name","Name","Kisan Name","किसान नाम"]},
+    {title:"Date", aliases:["Date","Gatepass Date","Gate Pass Date","दिनांक"]},
+    {title:"Season Year", aliases:["Season Year","Season","SeasonYear","सीज़न"]},
+    {title:"Crop", aliases:["Crop","Crop Name","फसल"]},
+    {title:"Village", aliases:["Village","Village Name","गाँव","गांव"]},
+    {title:"Mobile No.", aliases:["Mobile No.","Mobile No","Mobile","Phone"]},
+    {title:"Gatepass No.", aliases:["Gatepass No.","Gatepass No","Gate Pass No","Gatepass","GP No"]},
+    {title:"Bore", aliases:["Bore","Bores","Bags","Bag","Bora","बोरे"]},
+    {title:"Qty (Quintal)", aliases:["Gatepass Qty","Gate Pass Qty","Qty","Quantity","Qtl","Quintal","क्विंटल"]}
+  ];
+
+  let rawCols = standard.map(c => {
+    const found = allKeys.find(k => c.aliases.some(a => norm(a) === norm(k)));
+    return {title:c.title, key:found || c.aliases[0]};
+  });
+
+  allKeys.forEach(k => {
+    if (!rawCols.some(c => norm(c.key) === norm(k))) rawCols.push({title:k,key:k});
+  });
+
+  const cols = rawCols.filter((c, idx) => {
+    if (idx === 0) return true;
+    return hasValueInColumn(filtered.length ? filtered : records, c.key, c.title);
+  });
+
+  const thead = $("tableHead");
+  thead.innerHTML = "";
+  const hr = document.createElement("tr");
+  
+  const selectHead = document.createElement("th");
+  selectHead.className = "col-cb";
+  selectHead.innerHTML = '<input type="checkbox" id="pageSelect">';
+  hr.appendChild(selectHead);
+
+  cols.forEach((c, idx) => {
+    const th = document.createElement("th");
+    if(idx === 0) th.className = "col-name";
+    if(norm(c.title) === "date") th.className = (th.className ? th.className + " " : "") + "col-date";
+    th.textContent = c.title;
+    hr.appendChild(th);
+  });
+  thead.appendChild(hr);
+
+  const pageCb = $("pageSelect");
+  if (pageCb) {
+    pageCb.checked = filtered.length > 0 && filtered.every(r => selectedKeys.has(r.key));
+    pageCb.addEventListener("change", e => {
+      filtered.forEach(r => {
+        if (e.target.checked) selectedKeys.add(r.key);
+        else selectedKeys.delete(r.key);
+      });
+      render();
+    });
+  }
+
+  const tbody = $("tableBody");
+  tbody.innerHTML = "";
+
+  if (!filtered.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = cols.length + 1;
+    td.className = "empty";
+    td.textContent = records.length ? "चयनित फसल / फिल्टर के लिए कोई रिकॉर्ड नहीं मिला।" : "Firebase में डेटा नहीं है।";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    $("tableFoot").innerHTML = "";
+    return;
+  }
+
+  filtered.forEach(r => {
+    const tr = document.createElement("tr");
+    
+    const checkTd = document.createElement("td");
+    checkTd.className = "col-cb";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = selectedKeys.has(r.key);
+
+    cb.addEventListener("change", () => {
+      if (cb.checked) selectedKeys.add(r.key);
+      else selectedKeys.delete(r.key);
+      $("selectedRows").textContent = selectedKeys.size;
+      const pCb = $("pageSelect");
+      if (pCb) pCb.checked = filtered.every(x => selectedKeys.has(x.key));
+    });
+
+    checkTd.appendChild(cb);
+    tr.appendChild(checkTd);
+
+    cols.forEach((c, idx) => {
+      const td = document.createElement("td");
+      if(idx === 0) td.className = "col-name";
+      if(norm(c.title) === "date") td.className = (td.className ? td.className + " " : "") + "col-date";
+
+      let value = r.data[c.key];
+
+      if (idx === 0 || norm(c.title).includes("customer") || norm(c.title).includes("farmer") || norm(c.title) === "name") {
+        value = formatName(value);
+      }
+
+      if (norm(c.title) === "date") {
+        value = shortDate(value);
+      }
+
+      const calc = getCalculatedValues(r);
+
+      if (norm(c.title).includes("qty") || norm(c.title).includes("quintal")) {
+        value = (calc.rawQ === "" && calc.rawB === "" && calc.qty === 0) ? "" : fmt(calc.qty, 2);
+      } else if (norm(c.title) === "bore") {
+        value = (calc.rawQ === "" && calc.rawB === "" && calc.bore === 0) ? "" : fmt(calc.bore, 0);
+      }
+
+      if (norm(c.title).includes("season")) {
+        td.innerHTML = value ? `<span class="badge-season">${value}</span>` : `<span class="badge-none">N/A</span>`;
+      } else if (norm(c.title).includes("crop")) {
+        td.innerHTML = value ? `<span class="badge-crop">${value}</span>` : `<span class="badge-none">N/A</span>`;
+      } else {
+        td.textContent = value === null || value === undefined ? "" : String(value);
+      }
+
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  const tfoot = $("tableFoot");
+  tfoot.innerHTML = "";
+  const ftr = document.createElement("tr");
+
+  const emptyTd = document.createElement("td");
+  emptyTd.className = "col-cb";
+  ftr.appendChild(emptyTd);
+
+  cols.forEach((c, idx) => {
+    const td = document.createElement("td");
+    if (idx === 0) {
+      td.className = "col-name";
+      td.textContent = "कुल Total";
+    } else if (norm(c.title).includes("qty") || norm(c.title).includes("quintal")) {
+      td.textContent = fmt(totalQty, 2);
+    } else if (norm(c.title) === "bore") {
+      td.textContent = fmt(totalBore, 0);
+    } else {
+      td.textContent = "";
+    }
+    ftr.appendChild(td);
+  });
+  tfoot.appendChild(ftr);
+}
+
+function applySelectedSeasonAndCropToRows(rowsList) {
+  const selSeason = $("uploadSeasonSelect").value;
+  const selCrop = $("uploadCropSelect").value;
+  const seasonAliases = ["seasonyear", "season", "सीज़न"];
+  const cropAliases = ["crop", "cropname", "फसल"];
+
+  rowsList.forEach(row => {
+    Object.keys(row).forEach(k => {
+      const nk = norm(k);
+      if (seasonAliases.includes(nk) || cropAliases.includes(nk)) {
+        delete row[k];
+      }
+    });
+    row["Season Year"] = selSeason;
+    row["Crop"] = selCrop;
+  });
+
+  return { selSeason, selCrop };
+}
+
+$("excelFile").addEventListener("click", e => {
+  e.target.value = "";
 });
-if(firebase.auth().currentUser)loadFirebaseRecords();
+
+$("excelFile").addEventListener("change", async e => {
+  excelRows = [];
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, {type:"array", cellDates:true});
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, {defval:"", raw:true});
+
+    if (!rows.length) { setUpload("❌ Excel खाली है।", true); return; }
+
+    excelRows = rows.map(row => {
+      const clean = {};
+      Object.entries(row).forEach(([k,v]) => {
+        let value = v;
+        if (norm(k) === "date" || norm(k).includes("gatepassdate")) value = isoDate(v);
+        clean[safeFieldName(k)] = value === undefined || value === null ? "" : value;
+      });
+      return clean;
+    }).filter(row => Object.values(row).some(v => String(v).trim() !== ""));
+
+    const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+
+    setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+  } catch (e) {
+    setUpload("❌ Read Error: " + e.message, true);
+  }
+});
+
+$("uploadBtn").addEventListener("click", async () => {
+  if (busy) return;
+  if (!excelRows.length) { setUpload("⚠️ Excel चुनें।", true); return; }
+
+  setBusy(true);
+  try {
+    applySelectedSeasonAndCropToRows(excelRows);
+
+    const snap = await recordsRef.once("value");
+    const oldData = snap.val() || {};
+    const known = new Set(Object.values(oldData).filter(v => v && typeof v === "object").map(v => identity(v)));
+
+    const seenExcel = new Set();
+    const updates = {};
+    let added = 0, skipped = 0;
+
+    for (const row of excelRows) {
+      const rowCopy = { ...row };
+      const id = identity(rowCopy);
+      if (known.has(id) || seenExcel.has(id)) { skipped++; continue; }
+      seenExcel.add(id);
+      const ref = recordsRef.push();
+      updates[ref.key] = rowCopy;
+      added++;
+    }
+
+    if (!added) { setUpload("⚠️ Duplicate: " + skipped, true); return; }
+
+    await recordsRef.update(updates);
+    setUpload("✅ Added: " + added + " | Skipped: " + skipped);
+    showNotice(`✅ ${added} new records added successfully!`);
+    $("excelFile").value = ""; excelRows = [];
+  } catch (e) {
+    setUpload("❌ Error: " + e.message, true);
+  } finally { setBusy(false); }
+});
+
+/* SEASON & CROP MODAL MANAGEMENT (FIXED EDIT & DELETE WITHOUT BLOCKED CONFIRM) */
+$("manageMasterBtn").addEventListener("click", () => {
+  isEditingMaster = false;
+  $("masterModal").style.display = "flex";
+  renderMasterModalLists();
+});
+
+$("closeMasterModal").addEventListener("click", () => {
+  isEditingMaster = false;
+  $("masterModal").style.display = "none";
+});
+
+// Helper to update existing records when a Season or Crop name is edited
+async function renameMasterInRecords(fieldType, oldVal, newVal) {
+  if (!oldVal || !newVal || norm(oldVal) === norm(newVal) || !recordsRef) return;
+  try {
+    const updates = {};
+    let count = 0;
+    records.forEach(r => {
+      if (!r.data) return;
+      if (fieldType === "season" && norm(getSeason(r.data)) === norm(oldVal)) {
+        updates[`${r.key}/Season Year`] = newVal;
+        count++;
+      } else if (fieldType === "crop" && norm(getCrop(r.data)) === norm(oldVal)) {
+        updates[`${r.key}/Crop`] = newVal;
+        count++;
+      }
+    });
+    if (count > 0) {
+      await recordsRef.update(updates);
+    }
+  } catch (err) {
+    console.warn("Record rename sync warning:", err);
+  }
+}
+
+function renderMasterModalLists() {
+  isEditingMaster = false;
+  const seasonList = $("seasonList");
+  seasonList.innerHTML = "";
+
+  if (!masterData.seasons.length) {
+    seasonList.innerHTML = '<div style="padding:8px; color:var(--muted); text-align:center;">कोई सीज़न नहीं है</div>';
+  } else {
+    masterData.seasons.forEach((s, idx) => {
+      const div = document.createElement("div");
+      div.className = "manage-item";
+
+      const titleSpan = document.createElement("span");
+      titleSpan.style.fontWeight = "bold";
+      titleSpan.textContent = s;
+
+      const btnGroup = document.createElement("div");
+      btnGroup.style.display = "flex";
+      btnGroup.style.gap = "4px";
+
+      const editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.className = "purple";
+      editBtn.style.padding = "4px 8px";
+      editBtn.style.fontSize = "11px";
+      editBtn.textContent = "✏️ Edit";
+      editBtn.addEventListener("click", () => openEditSeasonRow(div, idx));
+
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "red";
+      delBtn.style.padding = "4px 8px";
+      delBtn.style.fontSize = "11px";
+      delBtn.textContent = "🗑️ Delete";
+      delBtn.addEventListener("click", () => openDeleteSeasonConfirm(div, idx));
+
+      btnGroup.appendChild(editBtn);
+      btnGroup.appendChild(delBtn);
+      div.appendChild(titleSpan);
+      div.appendChild(btnGroup);
+      seasonList.appendChild(div);
+    });
+  }
+
+  const cropList = $("cropList");
+  cropList.innerHTML = "";
+
+  if (!masterData.crops.length) {
+    cropList.innerHTML = '<div style="padding:8px; color:var(--muted); text-align:center;">कोई फसल नहीं है</div>';
+  } else {
+    masterData.crops.forEach((c, idx) => {
+      const div = document.createElement("div");
+      div.className = "manage-item";
+
+      const infoDiv = document.createElement("div");
+      const nameStrong = document.createElement("strong");
+      nameStrong.textContent = c.name;
+      const wtSmall = document.createElement("small");
+      wtSmall.style.color = "var(--muted)";
+      wtSmall.style.marginLeft = "4px";
+      wtSmall.textContent = `(${c.weightKg || 50} kg/bag)`;
+      infoDiv.appendChild(nameStrong);
+      infoDiv.appendChild(wtSmall);
+
+      const btnGroup = document.createElement("div");
+      btnGroup.style.display = "flex";
+      btnGroup.style.gap = "4px";
+
+      const editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.className = "purple";
+      editBtn.style.padding = "4px 8px";
+      editBtn.style.fontSize = "11px";
+      editBtn.textContent = "✏️ Edit";
+      editBtn.addEventListener("click", () => openEditCropRow(div, idx));
+
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "red";
+      delBtn.style.padding = "4px 8px";
+      delBtn.style.fontSize = "11px";
+      delBtn.textContent = "🗑️ Delete";
+      delBtn.addEventListener("click", () => openDeleteCropConfirm(div, idx));
+
+      btnGroup.appendChild(editBtn);
+      btnGroup.appendChild(delBtn);
+      div.appendChild(infoDiv);
+      div.appendChild(btnGroup);
+      cropList.appendChild(div);
+    });
+  }
+}
+
+function openEditSeasonRow(container, idx) {
+  isEditingMaster = true;
+  const curVal = masterData.seasons[idx] || "";
+  container.innerHTML = "";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = curVal;
+  input.style.width = "150px";
+  input.style.padding = "4px 6px";
+
+  const btnGroup = document.createElement("div");
+  btnGroup.style.display = "flex";
+  btnGroup.style.gap = "4px";
+
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "green";
+  saveBtn.style.padding = "4px 8px";
+  saveBtn.style.fontSize = "11px";
+  saveBtn.textContent = "💾 Save";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.className = "gray";
+  cancelBtn.style.padding = "4px 8px";
+  cancelBtn.style.fontSize = "11px";
+  cancelBtn.textContent = "Cancel";
+
+  const doSave = async () => {
+    const newVal = input.value.trim();
+    if (!newVal) {
+      showNotice("⚠️ कृपया सीज़न का नाम लिखें!");
+      return;
+    }
+    const duplicate = masterData.seasons.some((s, i) => i !== idx && norm(s) === norm(newVal));
+    if (duplicate) {
+      showNotice("⚠️ यह सीज़न पहले से मौजूद है!");
+      return;
+    }
+    const oldVal = masterData.seasons[idx];
+    masterData.seasons[idx] = newVal;
+    if ($("uploadSeasonSelect").value === oldVal) $("uploadSeasonSelect").value = newVal;
+    if ($("seasonFilter").value === oldVal) $("seasonFilter").value = newVal;
+
+    isEditingMaster = false;
+    await saveMasterData();
+    await renameMasterInRecords("season", oldVal, newVal);
+    showNotice("✅ Season Updated!");
+  };
+
+  saveBtn.addEventListener("click", doSave);
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") doSave();
+    if (e.key === "Escape") renderMasterModalLists();
+  });
+  cancelBtn.addEventListener("click", () => renderMasterModalLists());
+
+  btnGroup.appendChild(saveBtn);
+  btnGroup.appendChild(cancelBtn);
+  container.appendChild(input);
+  container.appendChild(btnGroup);
+  input.focus();
+}
+
+function openDeleteSeasonConfirm(container, idx) {
+  isEditingMaster = true;
+  const name = masterData.seasons[idx];
+  container.innerHTML = "";
+
+  const msg = document.createElement("span");
+  msg.style.color = "var(--red)";
+  msg.style.fontWeight = "bold";
+  msg.style.fontSize = "11px";
+  msg.textContent = `सीज़न "${name}" डिलीट करें?`;
+
+  const btnGroup = document.createElement("div");
+  btnGroup.style.display = "flex";
+  btnGroup.style.gap = "4px";
+
+  const yesBtn = document.createElement("button");
+  yesBtn.type = "button";
+  yesBtn.className = "red";
+  yesBtn.style.padding = "4px 8px";
+  yesBtn.style.fontSize = "11px";
+  yesBtn.textContent = "✓ Yes, Delete";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.className = "gray";
+  cancelBtn.style.padding = "4px 8px";
+  cancelBtn.style.fontSize = "11px";
+  cancelBtn.textContent = "Cancel";
+
+  yesBtn.addEventListener("click", async () => {
+    masterData.seasons.splice(idx, 1);
+    if ($("seasonFilter").value === name) $("seasonFilter").value = "";
+    isEditingMaster = false;
+    await saveMasterData();
+    showNotice(`🗑️ Season "${name}" Deleted!`);
+  });
+
+  cancelBtn.addEventListener("click", () => renderMasterModalLists());
+
+  btnGroup.appendChild(yesBtn);
+  btnGroup.appendChild(cancelBtn);
+  container.appendChild(msg);
+  container.appendChild(btnGroup);
+}
+
+function openEditCropRow(container, idx) {
+  isEditingMaster = true;
+  const c = masterData.crops[idx] || { name: "", weightKg: 50 };
+  container.innerHTML = "";
+
+  const inputWrap = document.createElement("div");
+  inputWrap.style.display = "flex";
+  inputWrap.style.gap = "4px";
+  inputWrap.style.alignItems = "center";
+
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.value = c.name;
+  nameInput.placeholder = "Crop Name";
+  nameInput.style.width = "110px";
+  nameInput.style.padding = "4px 6px";
+
+  const wtInput = document.createElement("input");
+  wtInput.type = "number";
+  wtInput.value = c.weightKg || 50;
+  wtInput.step = "0.1";
+  wtInput.style.width = "65px";
+  wtInput.style.padding = "4px 6px";
+
+  const kgLabel = document.createElement("small");
+  kgLabel.textContent = "kg";
+
+  inputWrap.appendChild(nameInput);
+  inputWrap.appendChild(wtInput);
+  inputWrap.appendChild(kgLabel);
+
+  const btnGroup = document.createElement("div");
+  btnGroup.style.display = "flex";
+  btnGroup.style.gap = "4px";
+
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "green";
+  saveBtn.style.padding = "4px 8px";
+  saveBtn.style.fontSize = "11px";
+  saveBtn.textContent = "💾 Save";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.className = "gray";
+  cancelBtn.style.padding = "4px 8px";
+  cancelBtn.style.fontSize = "11px";
+  cancelBtn.textContent = "Cancel";
+
+  const doSaveCrop = async () => {
+    const nameVal = nameInput.value.trim();
+    const wtVal = Number(wtInput.value) || 50;
+    if (!nameVal) {
+      showNotice("⚠️ कृपया फसल का नाम लिखें!");
+      return;
+    }
+    const duplicate = masterData.crops.some((item, i) => i !== idx && norm(item.name) === norm(nameVal));
+    if (duplicate) {
+      showNotice("⚠️ यह फसल पहले से मौजूद है!");
+      return;
+    }
+    const oldName = c.name;
+    masterData.crops[idx] = { name: nameVal, weightKg: wtVal };
+    if ($("uploadCropSelect").value === oldName) $("uploadCropSelect").value = nameVal;
+    if ($("cropFilter").value === oldName) $("cropFilter").value = nameVal;
+
+    isEditingMaster = false;
+    await saveMasterData();
+    await renameMasterInRecords("crop", oldName, nameVal);
+    showNotice("✅ Crop Updated!");
+  };
+
+  saveBtn.addEventListener("click", doSaveCrop);
+  nameInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") doSaveCrop();
+    if (e.key === "Escape") renderMasterModalLists();
+  });
+  wtInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") doSaveCrop();
+    if (e.key === "Escape") renderMasterModalLists();
+  });
+  cancelBtn.addEventListener("click", () => renderMasterModalLists());
+
+  btnGroup.appendChild(saveBtn);
+  btnGroup.appendChild(cancelBtn);
+  container.appendChild(inputWrap);
+  container.appendChild(btnGroup);
+  nameInput.focus();
+}
+
+function openDeleteCropConfirm(container, idx) {
+  isEditingMaster = true;
+  const cropObj = masterData.crops[idx];
+  const name = cropObj ? cropObj.name : "";
+  container.innerHTML = "";
+
+  const msg = document.createElement("span");
+  msg.style.color = "var(--red)";
+  msg.style.fontWeight = "bold";
+  msg.style.fontSize = "11px";
+  msg.textContent = `फसल "${name}" डिलीट करें?`;
+
+  const btnGroup = document.createElement("div");
+  btnGroup.style.display = "flex";
+  btnGroup.style.gap = "4px";
+
+  const yesBtn = document.createElement("button");
+  yesBtn.type = "button";
+  yesBtn.className = "red";
+  yesBtn.style.padding = "4px 8px";
+  yesBtn.style.fontSize = "11px";
+  yesBtn.textContent = "✓ Yes, Delete";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.className = "gray";
+  cancelBtn.style.padding = "4px 8px";
+  cancelBtn.style.fontSize = "11px";
+  cancelBtn.textContent = "Cancel";
+
+  yesBtn.addEventListener("click", async () => {
+    masterData.crops.splice(idx, 1);
+    if ($("cropFilter").value === name) $("cropFilter").value = "";
+    isEditingMaster = false;
+    await saveMasterData();
+    showNotice(`🗑️ Crop "${name}" Deleted!`);
+  });
+
+  cancelBtn.addEventListener("click", () => renderMasterModalLists());
+
+  btnGroup.appendChild(yesBtn);
+  btnGroup.appendChild(cancelBtn);
+  container.appendChild(msg);
+  container.appendChild(btnGroup);
+}
+
+$("addSeasonBtn").addEventListener("click", async () => {
+  const val = $("newSeasonInput").value.trim();
+  if (!val) {
+    showNotice("⚠️ कृपया सीज़न (Season Year) लिखें!");
+    return;
+  }
+  if (!masterData.seasons.some(s => norm(s) === norm(val))) {
+    masterData.seasons.push(val);
+    $("newSeasonInput").value = "";
+    await saveMasterData();
+    showNotice("✅ Season Added!");
+  } else {
+    showNotice("⚠️ Season Already Exists!");
+  }
+});
+
+$("newSeasonInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") $("addSeasonBtn").click();
+});
+
+$("addCropBtn").addEventListener("click", async () => {
+  const nameVal = $("newCropInput").value.trim();
+  const weightVal = Number($("newCropWeightInput").value) || 50;
+
+  if (!nameVal) {
+    showNotice("⚠️ कृपया फसल का नाम लिखें!");
+    return;
+  }
+  const idx = masterData.crops.findIndex(c => norm(c.name) === norm(nameVal));
+
+  if (idx === -1) {
+    masterData.crops.push({ name: nameVal, weightKg: weightVal });
+    showNotice("✅ Crop Added!");
+  } else {
+    masterData.crops[idx].weightKg = weightVal;
+    showNotice("✅ Crop Weight Updated!");
+  }
+
+  $("newCropInput").value = "";
+  await saveMasterData();
+});
+
+$("newCropInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") $("addCropBtn").click();
+});
+
+$("selectAllBtn").addEventListener("click", () => { getFiltered().forEach(r => selectedKeys.add(r.key)); render(); });
+$("unselectBtn").addEventListener("click", () => { selectedKeys.clear(); render(); });
+
+$("deleteBtn").addEventListener("click", () => {
+  if (busy) return;
+  if (!selectedKeys.size) {
+    showNotice("⚠️ कृपया कम से कम एक एंट्री चुनें!");
+    return;
+  }
+  $("deleteConfirmText").textContent = `क्या आप चुने हुए ${selectedKeys.size} रिकॉर्ड डिलीट करना चाहते हैं?`;
+  $("deleteModal").style.display = "flex";
+});
+
+$("cancelDeleteBtn").addEventListener("click", () => {
+  $("deleteModal").style.display = "none";
+});
+
+$("confirmDeleteBtn").addEventListener("click", async () => {
+  $("deleteModal").style.display = "none";
+  if (!selectedKeys.size) return;
+
+  setBusy(true);
+  const keys = [...selectedKeys];
+  try {
+    const updates = {};
+    keys.forEach(k => updates[k] = null);
+    await recordsRef.update(updates);
+    selectedKeys.clear();
+    setUpload("🗑️ Deleted " + keys.length + " entries");
+    showNotice(`🗑️ ${keys.length} entries successfully deleted!`);
+  } catch (e) {
+    showNotice("❌ Delete Error: " + e.message);
+  } finally {
+    setBusy(false);
+  }
+});
+
+/* Export & Print */
+$("exportBtn").addEventListener("click", () => {
+  const list = getFiltered();
+  if (!list.length) { showNotice("कोई डेटा नहीं है!"); return; }
+  const ws = XLSX.utils.json_to_sheet(list.map(r => ({...r.data})));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "GatePass");
+  XLSX.writeFile(wb, "GatePass_Export.xlsx");
+});
+
+$("printBtn").addEventListener("click", () => window.print());
+
+/* Sync Dropdowns */
+$("uploadSeasonSelect").addEventListener("change", (e) => {
+  $("seasonFilter").value = e.target.value;
+  if (excelRows.length) {
+    const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+    setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+  }
+  render();
+});
+
+$("uploadCropSelect").addEventListener("change", (e) => {
+  $("cropFilter").value = e.target.value;
+  if (excelRows.length) {
+    const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+    setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+  }
+  render();
+});
+
+$("seasonFilter").addEventListener("change", (e) => {
+  if (e.target.value && e.target.value !== "__UNASSIGNED__") {
+    $("uploadSeasonSelect").value = e.target.value;
+    if (excelRows.length) {
+      const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+      setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+    }
+  }
+  render();
+});
+
+$("cropFilter").addEventListener("change", (e) => {
+  if (e.target.value && e.target.value !== "__UNASSIGNED__") {
+    $("uploadCropSelect").value = e.target.value;
+    if (excelRows.length) {
+      const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+      setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+    }
+  }
+  render();
+});
+
+["search","villageFilter","fromDate","toDate","sortOrder"].forEach(id => {
+  const el = $(id);
+  if (el) el.addEventListener(id === "search" ? "input" : "change", render);
+});
+
+$("clearFilters").addEventListener("click", () => {
+  $("search").value = ""; 
+  $("seasonFilter").value = "";
+  $("cropFilter").value = "";
+  $("villageFilter").value = "";
+  $("fromDate").value = ""; 
+  $("toDate").value = "";
+  $("sortOrder").value = "newest";
+  render();
+});
+
+$("refreshBtn").addEventListener("click", async () => {
+  try {
+    setConnection("🔄 Syncing...");
+    await recordsRef.once("value");
+    setConnection("🟢 Firebase Online (" + records.length + " Rows)");
+  } catch (e) { setConnection("❌ Sync Error", true); }
+});
+
+startFirebase();
 </script>
 </body>
 </html>
