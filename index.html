@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -94,28 +94,33 @@ th.col-name, td.col-name {
   left: 35px;
   background: #ffffff;
   z-index: 3;
-  min-width: 150px;
+  min-width: 85px;
+  max-width: 105px;
+  width: 95px;
+  white-space: pre-line;
+  line-height: 1.2;
+  word-break: break-word;
   font-weight: 800;
-  color: #000000;
+  color: #1e40af;
   border-right: 2px solid #94a3b8;
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 th.col-cb, th.col-name {
   background: #cbd5e1;
+  color: var(--primary);
   z-index: 4;
 }
 
 th.col-date, td.col-date {
-  max-width: 95px;
-  min-width: 95px;
-  width: 95px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 65px;
+  min-width: 55px;
+  width: 60px;
+  white-space: pre-line;
+  line-height: 1.15;
   text-align: center;
 }
 
-/* STREAMING_CHUNK:Styling badges, modals, and print media rules... -->
 .badge-season {
   background: #e0f2fe;
   color: #0369a1;
@@ -470,12 +475,14 @@ function fmt(v, dec = 2) {
 
 function formatName(nameStr) {
   if (!nameStr) return "";
-  return String(nameStr)
+  const words = String(nameStr)
     .trim()
     .toLowerCase()
     .split(/\s+/)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1));
+  if (words.length <= 1) return words[0] || "";
+  return words[0] + "\n" + words.slice(1).join(" ");
 }
 
 function getCustomer(r) { return formatName(field(r, ["Customer Name", "Customer", "Farmer Name", "Name", "Kisan Name", "किसान नाम", "किसान का नाम"])); }
@@ -511,7 +518,7 @@ function shortDate(v) {
   const iso = isoDate(v);
   if (!iso || !iso.includes("-")) return String(v || "");
   const parts = iso.split("-");
-  return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}` : iso;
+  return parts.length === 3 ? `${parts[2]}/${parts[1]}\n${parts[0].slice(-2)}` : iso;
 }
 
 function getDate(r) { return isoDate(field(r, ["Date", "Gatepass Date", "Gate Pass Date", "J Form Date", "दिनांक"])); }
@@ -827,8 +834,13 @@ function render() {
     if (!rawCols.some(c => norm(c.key) === norm(k))) rawCols.push({title:k,key:k});
   });
 
+  const hiddenCols = ["seasonyear", "season", "सीज़न", "crop", "cropname", "फसल", "arthiya", "arthiyaname", "firm", "arthiyadetails", "आढ़तिया"];
+
   const cols = rawCols.filter((c, idx) => {
     if (idx === 0) return true;
+    const nTitle = norm(c.title);
+    const nKey = norm(c.key);
+    if (hiddenCols.some(h => nTitle.includes(h) || nKey.includes(h))) return false;
     return hasValueInColumn(filtered.length ? filtered : records, c.key, c.title);
   });
 
@@ -980,6 +992,24 @@ function applySelectedSeasonAndCropToRows(rowsList) {
   return { selSeason, selCrop };
 }
 
+function isValidCustomerRow(row) {
+  const name = getCustomer(row).trim();
+  if (!name) return false;
+
+  const nName = norm(name);
+  const invalidNames = ["total", "grandtotal", "subtotal", "sum", "कुल", "कुलtotal", "योग", "कुलयोग", "customername", "farmername", "name"];
+  if (
+    invalidNames.includes(nName) ||
+    nName.startsWith("total") ||
+    nName.endsWith("total") ||
+    nName.includes("कुलtotal") ||
+    nName.includes("grandtotal")
+  ) {
+    return false;
+  }
+  return true;
+}
+
 $("excelFile").addEventListener("click", e => {
   e.target.value = "";
 });
@@ -1005,7 +1035,12 @@ $("excelFile").addEventListener("change", async e => {
         clean[safeFieldName(k)] = value === undefined || value === null ? "" : value;
       });
       return clean;
-    }).filter(row => Object.values(row).some(v => String(v).trim() !== ""));
+    }).filter(row => Object.values(row).some(v => String(v).trim() !== "") && isValidCustomerRow(row));
+
+    if (!excelRows.length) {
+      setUpload("❌ Excel में कोई वैध Customer Name डेटा नहीं मिला।", true);
+      return;
+    }
 
     const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
 
