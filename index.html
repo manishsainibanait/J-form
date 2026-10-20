@@ -529,8 +529,12 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
     <!-- Multi-Check and Print Controls Bar -->
     <div class="summary-actions-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #cbd5e1; gap:6px; flex-wrap:wrap;">
-      <div style="font-size:11.5px; color:var(--primary);">
-        चुने किसान: <strong id="summaryFarmerCount">0</strong> | GP: <strong id="summaryTotalGP">0</strong> | राशि: <strong id="summaryGrandAmount" style="color:var(--green); font-size:12.5px;">₹0</strong>
+      <div style="font-size:11.5px; color:var(--primary); line-height: 1.4;">
+        चुने किसान: <strong id="summaryFarmerCount">0</strong> | 
+        GP: <strong id="summaryTotalGP">0</strong> | 
+        बोरे: <strong id="summaryTotalBore" style="color:var(--purple)">0</strong> | 
+        क्विंटल: <strong id="summaryTotalQty" style="color:var(--green)">0.00</strong> | 
+        राशि: <strong id="summaryGrandAmount" style="color:var(--green); font-size:12.5px;">₹0</strong>
       </div>
       <div style="display:flex; gap:5px; flex-wrap:wrap;">
         <button type="button" id="summaryToggleCheckedBtn" class="purple" style="padding:4px 8px; font-size:11px;">👁️ Show Checked (0)</button>
@@ -2000,6 +2004,8 @@ function openSummaryModal() {
     $("summaryContainer").innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">चयनित फिल्टर के लिए कोई डेटा नहीं है!</div>';
     $("summaryFarmerCount").textContent = "0";
     $("summaryTotalGP").textContent = "0";
+    $("summaryTotalBore").textContent = "0";
+    $("summaryTotalQty").textContent = "0.00";
     $("summaryGrandAmount").textContent = "₹0";
     $("summaryVillageFilter").innerHTML = '<option value="">सभी गाँव (All Villages)</option>';
     $("summaryModal").style.display = "flex";
@@ -2063,7 +2069,6 @@ function openSummaryModal() {
   if (!selectedSummaryFarmerKeys.size) {
     selectedSummaryFarmerKeys = new Set(currentSummaryFarmers.map(f => f.uniqueKey));
   } else {
-    // retain only valid keys
     selectedSummaryFarmerKeys = new Set([...selectedSummaryFarmerKeys].filter(k => currentSummaryFarmers.some(f => f.uniqueKey === k)));
   }
 
@@ -2132,25 +2137,31 @@ function renderSummaryCards() {
   // Calculate totals ONLY for selected (checked) farmers within current filtered view
   let checkedFarmerCount = 0;
   let totalGP = 0;
+  let totalBore = 0;
+  let totalQty = 0;
   let grandTotalAmount = 0;
 
   filteredFarmers.forEach(f => {
     if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
       checkedFarmerCount++;
       totalGP += f.items.length;
+      totalBore += f.totalBore;
+      totalQty += f.totalQty;
       grandTotalAmount += f.totalAmount;
     }
   });
 
   $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
   $("summaryTotalGP").textContent = totalGP;
+  $("summaryTotalBore").textContent = fmt(totalBore, 0);
+  $("summaryTotalQty").textContent = fmt(totalQty, 2);
   $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
   updateToggleCheckedBtnState();
 
   const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
   const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
   const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
-  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
+  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल बोरे: ${fmt(totalBore, 0)} | कुल क्विंटल: ${fmt(totalQty, 2)} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
 
   if (!filteredFarmers.length) {
     container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">सर्च / फिल्टर के लिए कोई रिकॉर्ड नहीं मिला!</div>';
@@ -2244,25 +2255,31 @@ function renderSummaryCards() {
 function updateSummaryTotalsOnly(filteredFarmers) {
   let checkedFarmerCount = 0;
   let totalGP = 0;
+  let totalBore = 0;
+  let totalQty = 0;
   let grandTotalAmount = 0;
 
   filteredFarmers.forEach(f => {
     if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
       checkedFarmerCount++;
       totalGP += f.items.length;
+      totalBore += f.totalBore;
+      totalQty += f.totalQty;
       grandTotalAmount += f.totalAmount;
     }
   });
 
   $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
   $("summaryTotalGP").textContent = totalGP;
+  $("summaryTotalBore").textContent = fmt(totalBore, 0);
+  $("summaryTotalQty").textContent = fmt(totalQty, 2);
   $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
 
   const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
   const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
   const selectedVillage = $("summaryVillageFilter").value;
   const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
-  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
+  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल बोरे: ${fmt(totalBore, 0)} | कुल क्विंटल: ${fmt(totalQty, 2)} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
 }
 
 // Toggle View: Only Checked Farmers vs All Farmers
@@ -2273,7 +2290,7 @@ $("summaryToggleCheckedBtn").addEventListener("click", () => {
   }
   showCheckedOnly = !showCheckedOnly;
   if (showCheckedOnly) {
-    $("summarySearchInput").value = ""; // Clear search to show all checked
+    $("summarySearchInput").value = "";
   }
   renderSummaryCards();
 });
@@ -2291,7 +2308,7 @@ $("summaryClearBtn").addEventListener("click", () => {
 
 // In-Modal Search & Filter Event Listeners
 $("summarySearchInput").addEventListener("input", () => {
-  showCheckedOnly = false; // switch back to normal search view when typing
+  showCheckedOnly = false;
   renderSummaryCards();
 });
 $("summaryVillageFilter").addEventListener("change", renderSummaryCards);
