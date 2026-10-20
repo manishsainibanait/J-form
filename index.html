@@ -24,6 +24,7 @@
   --red: #b91c1c;
   --purple: #7e22ce;
   --orange: #c2410c;
+  --teal: #0f766e;
 }
 
 *{box-sizing:border-box; margin:0; padding:0;}
@@ -52,6 +53,7 @@ button:disabled{opacity:0.4; cursor:not-allowed;}
 .purple{background:var(--purple);}
 .gray{background:#475569;}
 .orange{background:var(--orange);}
+.teal{background:var(--teal);}
 
 .actions{display:flex; flex-wrap:wrap; gap:6px;}
 .status{background:#eff6ff; color:#1e40af; padding:6px 8px; border-radius:6px; margin-top:6px; font-size:11px; border:1px solid #bfdbfe;}
@@ -62,7 +64,7 @@ button:disabled{opacity:0.4; cursor:not-allowed;}
 .stat-box small{display:block; font-size:10px; color:var(--muted); font-weight:600;}
 .stat-box strong{font-size:14px; font-weight:800; color:var(--primary);}
 
-.filter-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:6px;}
+.filter-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:6px;}
 
 /* Table CSS */
 .tablewrap{
@@ -136,6 +138,22 @@ th.col-date, td.col-date {
   font-weight: 600;
   font-size: 11px;
 }
+.badge-yes {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.badge-no {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+}
 .badge-none {
   background: #f1f5f9;
   color: #64748b;
@@ -178,13 +196,13 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   background-color: white;
   border-radius: 8px;
   padding: 16px;
-  width: 92%;
-  max-width: 520px;
+  width: 95%;
+  max-width: 540px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .modal-header h3 { font-size: 15px; color: var(--primary); }
-.close-modal { font-size: 20px; cursor: pointer; color: var(--muted); font-weight: bold; padding: 0 4px; }
+.close-modal { font-size: 22px; cursor: pointer; color: var(--muted); font-weight: bold; padding: 0 4px; }
 .manage-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; margin-top: 8px; }
 .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-bottom: 1px solid #f1f5f9; gap:8px; flex-wrap: wrap;}
 .manage-item:last-child { border-bottom: none; }
@@ -203,14 +221,109 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   font-weight: 600;
 }
 
-@media print{
- header, .no-print, .top-section, .modal{display:none!important}
- body{background:white}
- .container{padding:0}
- .tablewrap{overflow:visible; max-height:none; border:none;}
- table{font-size:10px;}
- th, td{position:static!important; padding:3px; border-color:#000;}
+/* 100% Fit Screen Summary Styles */
+.summary-farmer-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  overflow: hidden;
+  page-break-inside: avoid;
+  transition: opacity 0.2s, border-color 0.2s;
 }
+.summary-farmer-card.unselected {
+  opacity: 0.55;
+  border-style: dashed;
+}
+.summary-farmer-header {
+  background: #f1f5f9;
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #cbd5e1;
+}
+.summary-farmer-header .farmer-title {
+  font-size: 13px;
+  color: var(--brand);
+  font-weight: 800;
+  word-break: break-word;
+}
+.summary-farmer-header .farmer-sub {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.summary-fit-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.summary-fit-table th {
+  background: #f8fafc;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 5px 3px;
+  border-bottom: 1px solid #cbd5e1;
+  position: static;
+  text-align: left;
+}
+.summary-fit-table td {
+  padding: 5px 3px;
+  font-size: 11px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.summary-fit-table tfoot td {
+  background: #f8fafc;
+  border-top: 1.5px solid #cbd5e1;
+  padding: 6px 3px;
+}
+
+/* Print View Controls */
+@media print{
+  header, .no-print, .top-section, #masterModal, #deleteModal, #msgBox { display:none!important; }
+  body { background:white; font-size:11px; }
+  .container { padding:0; }
+  .tablewrap { overflow:visible; max-height:none; border:none; }
+  table { font-size:10px; }
+  th, td { position:static!important; padding:3px; border-color:#000; }
+
+  body.printing-summary .container,
+  body.printing-summary .card { display: none !important; }
+  
+  body.printing-summary #summaryModal {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    background: transparent !important;
+  }
+  body.printing-summary #summaryModal .modal-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  body.printing-summary .modal-header,
+  body.printing-summary .summary-actions-bar,
+  body.printing-summary .summary-filter-bar {
+    display: none !important;
+  }
+  body.printing-summary .summary-farmer-card.unselected {
+    display: none !important;
+  }
+  .print-header-visible {
+    display: block !important;
+  }
+}
+.print-header-visible { display: none; }
 </style>
 </head>
 
@@ -247,6 +360,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
       </div>
 
       <div class="actions">
+        <button id="summaryBtn" class="teal">📑 Gatepass Summary</button>
         <button id="exportBtn" class="purple">⬇️ Export</button>
         <button id="printBtn" class="gray">🖨️ Print</button>
         <button id="manageMasterBtn" class="orange">⚙️ Season & Crop Manage</button>
@@ -284,14 +398,31 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
           <select id="cropFilter"><option value="">सभी फसलें</option></select>
         </div>
         <div>
-          <label>गाँव</label>
+          <label>बायोमेट्रिक (Biometric)</label>
+          <select id="biometricFilter">
+            <option value="">सभी (All)</option>
+            <option value="yes">Yes (हाँ)</option>
+            <option value="no">No (नहीं)</option>
+          </select>
+        </div>
+        <div>
+          <label>ऑक्शन (Auction)</label>
+          <select id="auctionFilter">
+            <option value="">सभी (All)</option>
+            <option value="yes">Yes (हो चुका)</option>
+            <option value="no">No (बाकी / Pending)</option>
+          </select>
+        </div>
+        <div>
+          <label>गाँव (Village)</label>
           <select id="villageFilter"><option value="">सभी गाँव</option></select>
         </div>
         <div>
-          <label>क्रम</label>
+          <label>क्रम (Sort)</label>
           <select id="sortOrder">
-            <option value="newest">नया पहले</option>
-            <option value="oldest">पुराना पहले</option>
+            <option value="uploadNewest" selected>नया अपलोड पहले (Newest)</option>
+            <option value="dateNewest">तारीख नई पहले</option>
+            <option value="dateOldest">तारीख पुरानी पहले</option>
             <option value="az">नाम A-Z</option>
             <option value="za">नाम Z-A</option>
           </select>
@@ -346,7 +477,6 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
       <span class="close-modal" id="closeMasterModal">&times;</span>
     </div>
 
-    <!-- Season Section -->
     <div style="margin-bottom:16px;">
       <h4 style="font-size:12px; margin-bottom:6px; color:var(--brand);">1. Manage Season Year (जैसे 2026)</h4>
       <div style="display:flex; gap:6px;">
@@ -356,16 +486,62 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
       <div class="manage-list" id="seasonList"></div>
     </div>
 
-    <!-- Crop Section -->
     <div>
-      <h4 style="font-size:12px; margin-bottom:6px; color:var(--brand);">2. Manage Crop & Bore Weight (Kg me)</h4>
-      <div style="display:grid; grid-template-columns: 2fr 1.5fr auto; gap:6px; margin-bottom:6px;">
-        <input type="text" id="newCropInput" placeholder="Crop Name (e.g. Wheat)">
-        <input type="number" id="newCropWeightInput" placeholder="Bore Wt (Kg)" value="50" step="0.1">
+      <h4 style="font-size:12px; margin-bottom:6px; color:var(--brand);">2. Manage Crop, Bag Wt & Rate (प्रति क्विंटल भाव)</h4>
+      <div style="display:grid; grid-template-columns: 2fr 1.2fr 1.5fr auto; gap:6px; margin-bottom:6px;">
+        <input type="text" id="newCropInput" placeholder="Crop Name">
+        <input type="number" id="newCropWeightInput" placeholder="Wt(Kg)" value="50" step="0.1">
+        <input type="number" id="newCropRateInput" placeholder="Rate ₹/Qtl" value="0" step="1">
         <button type="button" id="addCropBtn" class="green">Add</button>
       </div>
       <div class="manage-list" id="cropList"></div>
     </div>
+  </div>
+</div>
+
+<!-- Modal: Gatepass Summary with Multi-Search & Show Checked Feature -->
+<div id="summaryModal" class="modal">
+  <div class="modal-content" style="max-width: 800px; width: 96%; max-height: 94vh; display: flex; flex-direction: column; padding: 10px;">
+    <div class="modal-header">
+      <h3>📑 किसान अनुसार Gatepass Summary</h3>
+      <span class="close-modal" id="closeSummaryModal">&times;</span>
+    </div>
+
+    <div class="print-header-visible" style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; text-align: center;">
+      <h2 style="font-size: 18px; margin: 0;">SAINI TRADING COMPANY</h2>
+      <p style="font-size: 13px; font-weight: bold; margin: 3px 0 0 0;">किसान-वार Gate Pass समरी रिपोर्ट</p>
+      <small id="summaryPrintMeta" style="color: #475569; font-size: 11px;"></small>
+    </div>
+
+    <!-- Summary In-Modal Multi Search & Village Filter Bar -->
+    <div class="summary-filter-bar no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px; background:#f1f5f9; padding:6px; border-radius:6px; border:1px solid #cbd5e1;">
+      <div>
+        <label style="font-size:9.5px; margin-bottom:1px;">🔍 Multi-Search (e.g. Balbir, Mohit)</label>
+        <input type="text" id="summarySearchInput" placeholder="एक या अधिक नाम (कोमा , लगाकर)..." style="padding:4px 6px; font-size:11.5px; background:white;">
+      </div>
+      <div>
+        <label style="font-size:9.5px; margin-bottom:1px;">🏡 Filter Village (गाँव)</label>
+        <select id="summaryVillageFilter" style="padding:4px 6px; font-size:11.5px; background:white;">
+          <option value="">सभी गाँव (All Villages)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Multi-Check and Print Controls Bar -->
+    <div class="summary-actions-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #cbd5e1; gap:6px; flex-wrap:wrap;">
+      <div style="font-size:11.5px; color:var(--primary);">
+        चुने किसान: <strong id="summaryFarmerCount">0</strong> | GP: <strong id="summaryTotalGP">0</strong> | राशि: <strong id="summaryGrandAmount" style="color:var(--green); font-size:12.5px;">₹0</strong>
+      </div>
+      <div style="display:flex; gap:5px; flex-wrap:wrap;">
+        <button type="button" id="summaryToggleCheckedBtn" class="purple" style="padding:4px 8px; font-size:11px;">👁️ Show Checked (0)</button>
+        <button type="button" id="summarySelectAllBtn" class="gray" style="padding:4px 7px; font-size:11px;">✓ All</button>
+        <button type="button" id="summaryClearBtn" class="gray" style="padding:4px 7px; font-size:11px;">✗ Clear</button>
+        <button type="button" id="summaryPrintBtn" class="green" style="padding:4px 8px; font-size:11px;">🖨️ Direct Print</button>
+        <button type="button" id="summaryCloseBtn" class="gray" style="padding:4px 8px; font-size:11px;">Close</button>
+      </div>
+    </div>
+
+    <div id="summaryContainer" style="overflow-y: auto; flex: 1; padding-right: 2px;"></div>
   </div>
 </div>
 
@@ -406,14 +582,13 @@ let records = [];
 let masterData = {
   seasons: ["2026", "2025"],
   crops: [
-    { name: "Wheat", weightKg: 50 },
-    { name: "Mustard", weightKg: 50 },
-    { name: "Paddy", weightKg: 37.5 },
-    { name: "Gram", weightKg: 50 }
+    { name: "Wheat", weightKg: 50, rate: 2425 },
+    { name: "Mustard", weightKg: 50, rate: 5650 },
+    { name: "Paddy", weightKg: 37.5, rate: 2320 },
+    { name: "Gram", weightKg: 50, rate: 5440 }
   ]
 };
 
-// Load cached masterData from localStorage if available
 try {
   const savedLocal = localStorage.getItem(LOCAL_MASTER_KEY);
   if (savedLocal) {
@@ -432,6 +607,11 @@ let excelRows = [];
 let initialLoadDone = false;
 let busy = false;
 let isEditingMaster = false;
+
+// Global stores for Summary Modal
+let currentSummaryFarmers = [];
+let selectedSummaryFarmerKeys = new Set();
+let showCheckedOnly = false; // Toggle to view only selected farmers
 
 const $ = id => document.getElementById(id);
 
@@ -487,7 +667,13 @@ function formatName(nameStr) {
 }
 
 function getCustomer(r) { return formatName(field(r, ["Customer Name", "Customer", "Farmer Name", "Name", "Kisan Name", "किसान नाम", "किसान का नाम"])); }
-function getVillage(r) { return String(field(r, ["Village", "Village Name", "गाँव", "गांव"]) ?? ""); }
+
+function getVillage(r) { 
+  return String(field(r, [
+    "Village", "Village Name", "Farmer Village", "Address", "City", "गाँव", "गांव", "Gram", "Gaon", "पता", "निवास"
+  ]) ?? "").trim(); 
+}
+
 function getMobile(r) { return String(field(r, ["Mobile No.", "Mobile No", "Mobile", "Phone", "Mobile Number"]) ?? ""); }
 function getGatepass(r) {
   return String(field(r, [
@@ -502,6 +688,8 @@ function getGatepass(r) {
 }
 function getSeason(r) { return String(field(r, ["Season Year", "Season", "SeasonYear", "सीज़न"]) ?? "").trim(); }
 function getCrop(r) { return String(field(r, ["Crop", "Crop Name", "फसल"]) ?? "").trim(); }
+function getBiometric(r) { return String(field(r, ["Biometric", "Biometric Status", "बायोमेट्रिक", "बायो"]) ?? "").trim(); }
+function getAuction(r) { return String(field(r, ["Auction", "Auction Status", "ऑक्शन", "बोली", "नीलामी", "Nillami", "Boli"]) ?? "").trim(); }
 function getRawQty(r) { return field(r, ["Gatepass Qty", "Gate Pass Qty", "Qty", "Quantity", "Qtl", "Quintal", "Net Qty", "क्विंटल"]); }
 function getRawBore(r) { return field(r, ["Bore", "Bores", "Bags", "Bag", "Bora", "Total Bags", "बोरे"]); }
 
@@ -584,9 +772,15 @@ function normalizeMasterCrops(crops) {
   if (!crops) return [];
   const arr = Array.isArray(crops) ? crops : Object.values(crops);
   return arr.map(c => {
-    if (typeof c === "string") return { name: c.trim(), weightKg: 50 };
-    if (c && typeof c === "object") return { name: String(c.name || "").trim(), weightKg: Number(c.weightKg) || 50 };
-    return { name: "", weightKg: 50 };
+    if (typeof c === "string") return { name: c.trim(), weightKg: 50, rate: 0 };
+    if (c && typeof c === "object") {
+      return { 
+        name: String(c.name || "").trim(), 
+        weightKg: Number(c.weightKg) || 50,
+        rate: Number(c.rate) || 0
+      };
+    }
+    return { name: "", weightKg: 50, rate: 0 };
   }).filter(c => c.name && c.name !== "undefined");
 }
 
@@ -649,7 +843,6 @@ function updateMasterDropdowns() {
   const uploadSeason = $("uploadSeasonSelect");
   const filterSeason = $("seasonFilter");
   
-  // Read saved season from localStorage or current element
   let savedSeason = localStorage.getItem(LAST_SELECTED_SEASON_KEY);
   const curUploadS = uploadSeason.value || savedSeason || masterData.seasons[0] || "";
   const curFilterS = filterSeason.value;
@@ -700,8 +893,62 @@ function listenRecords() {
     selectedKeys = new Set([...selectedKeys].filter(k => records.some(r => r.key === k)));
     initialLoadDone = true;
     setConnection("🟢 Firebase Online (" + records.length + " Rows)");
+    updateDynamicFilterOptions();
     render();
   }, e => setConnection("❌ Load Error: " + e.message, true));
+}
+
+function updateDynamicFilterOptions() {
+  const vSelect = $("villageFilter");
+  const currentVillage = vSelect.value;
+  const villageMap = new Map();
+
+  records.forEach(r => {
+    const v = getVillage(r.data);
+    if (v && v.trim()) {
+      const clean = v.trim();
+      const n = norm(clean);
+      if (!villageMap.has(n)) {
+        villageMap.set(n, clean);
+      }
+    }
+  });
+
+  const sortedVillages = [...villageMap.values()].sort((a,b) => a.localeCompare(b, 'hi'));
+  let vHtml = '<option value="">सभी गाँव</option>';
+  sortedVillages.forEach(v => {
+    vHtml += `<option value="${v}">${v}</option>`;
+  });
+  vSelect.innerHTML = vHtml;
+
+  if (currentVillage && sortedVillages.some(v => norm(v) === norm(currentVillage))) {
+    vSelect.value = currentVillage;
+  }
+
+  const aSelect = $("auctionFilter");
+  const currentAuction = aSelect.value;
+  const rawAuctionValues = new Set();
+
+  records.forEach(r => {
+    const a = getAuction(r.data);
+    if (a && a.trim()) rawAuctionValues.add(a.trim());
+  });
+
+  let aHtml = '<option value="">सभी (All)</option>';
+  aHtml += '<option value="yes">Yes (हो चुका / Done)</option>';
+  aHtml += '<option value="no">No (बाकी / Pending)</option>';
+
+  const standardVals = ["yes", "y", "done", "true", "हाँ", "no", "n", "pending", "false", "नहीं"];
+  const otherStatuses = [...rawAuctionValues].filter(val => !standardVals.includes(norm(val))).sort();
+  
+  otherStatuses.forEach(st => {
+    aHtml += `<option value="${st}">${st}</option>`;
+  });
+
+  aSelect.innerHTML = aHtml;
+  if (currentAuction) {
+    aSelect.value = currentAuction;
+  }
 }
 
 function getCropWeight(cropName) {
@@ -710,7 +957,12 @@ function getCropWeight(cropName) {
   return found && found.weightKg ? Number(found.weightKg) : 50;
 }
 
-/* STRICT SINGLE QUANTITY CALCULATOR - PREVENTS DOUBLE COUNTING */
+function getCropRate(cropName) {
+  if (!cropName) return 0;
+  const found = masterData.crops.find(c => norm(c.name) === norm(cropName));
+  return found && found.rate ? Number(found.rate) : 0;
+}
+
 function getCalculatedValues(r) {
   const rawQ = String(getRawQty(r.data) ?? "").trim();
   const rawB = String(getRawBore(r.data) ?? "").trim();
@@ -718,30 +970,34 @@ function getCalculatedValues(r) {
   let q = 0;
   let b = 0;
 
+  const cropName = getCrop(r.data) || $("cropFilter").value || $("uploadCropSelect").value;
+  const bagWtKg = getCropWeight(cropName);
+
   if (rawQ !== "") {
     q = num(rawQ);
     if (rawB !== "") {
       b = num(rawB);
     } else {
-      const cropName = getCrop(r.data) || $("cropFilter").value || $("uploadCropSelect").value;
-      const bagWtKg = getCropWeight(cropName);
       b = Math.round((q * 100) / bagWtKg);
     }
   } 
   else if (rawB !== "") {
     b = num(rawB);
-    const cropName = getCrop(r.data) || $("cropFilter").value || $("uploadCropSelect").value;
-    const bagWtKg = getCropWeight(cropName);
     q = (b * bagWtKg) / 100;
   }
 
-  return { qty: q, bore: b, rawQ, rawB };
+  const rate = getCropRate(cropName);
+  const amount = q * rate;
+
+  return { qty: q, bore: b, rawQ, rawB, rate, amount };
 }
 
 function getFiltered() {
   const q = norm($("search").value);
   const season = $("seasonFilter").value;
   const crop = $("cropFilter").value;
+  const biometric = norm($("biometricFilter").value);
+  const auction = $("auctionFilter").value;
   const village = $("villageFilter").value;
   const from = $("fromDate").value;
   const to = $("toDate").value;
@@ -750,6 +1006,10 @@ function getFiltered() {
     const d = getDate(r.data);
     const rSeason = getSeason(r.data);
     const rCrop = getCrop(r.data);
+    const rVillage = getVillage(r.data);
+    const rBio = norm(getBiometric(r.data));
+    const rAucRaw = getAuction(r.data);
+    const rAucNorm = norm(rAucRaw);
 
     if (season) {
       if (season === "__UNASSIGNED__") {
@@ -767,17 +1027,48 @@ function getFiltered() {
       }
     }
 
-    if (village && getVillage(r.data) !== village) return false;
+    if (village) {
+      if (!rVillage || norm(rVillage) !== norm(village)) {
+        return false;
+      }
+    }
+
+    if (biometric) {
+      const isYes = (rBio === "yes" || rBio === "y" || rBio === "true" || rBio === "हाँ" || rBio === "ha" || rBio === "1");
+      if (biometric === "yes" && !isYes) return false;
+      if (biometric === "no" && isYes) return false;
+    }
+
+    if (auction) {
+      const isAuctionDone = (rAucNorm === "yes" || rAucNorm === "y" || rAucNorm === "done" || rAucNorm === "true" || rAucNorm === "हाँ" || rAucNorm === "1" || rAucNorm === "ok");
+      
+      if (auction === "yes") {
+        if (!isAuctionDone) return false;
+      } else if (auction === "no") {
+        if (isAuctionDone) return false;
+      } else {
+        if (rAucNorm !== norm(auction)) return false;
+      }
+    }
+
     if (from && (!d || d < from)) return false;
     if (to && (!d || d > to)) return false;
+
     if (q && !norm(Object.values(r.data).join(" ")).includes(q)) return false;
+
     return true;
   });
 
   const sort = $("sortOrder").value;
   list.sort((a,b) => {
-    if (sort === "newest") return getDate(b.data).localeCompare(getDate(a.data));
-    if (sort === "oldest") return getDate(a.data).localeCompare(getDate(b.data));
+    if (sort === "uploadNewest") {
+      const timeB = Number(b.data._updatedAt || b.data._uploadedAt || 0);
+      const timeA = Number(a.data._updatedAt || a.data._uploadedAt || 0);
+      if (timeB !== timeA) return timeB - timeA;
+      return String(b.key).localeCompare(String(a.key));
+    }
+    if (sort === "dateNewest") return getDate(b.data).localeCompare(getDate(a.data));
+    if (sort === "dateOldest") return getDate(a.data).localeCompare(getDate(b.data));
     if (sort === "az") return getCustomer(a.data).localeCompare(getCustomer(b.data));
     if (sort === "za") return getCustomer(b.data).localeCompare(getCustomer(a.data));
     return 0;
@@ -787,6 +1078,7 @@ function getFiltered() {
 }
 
 function hasValueInColumn(list, colKey, title) {
+  if (colKey.startsWith("_")) return false;
   return list.some(r => {
     let val = r.data[colKey];
     if (norm(title) === "date") val = isoDate(val);
@@ -818,26 +1110,19 @@ function render() {
   $("selectedRows").textContent = selectedKeys.size;
 
   const currentCrop = $("cropFilter").value || $("uploadCropSelect").value;
-  $("currentCropBadge").textContent = (currentCrop && currentCrop !== "__UNASSIGNED__") ? `(${currentCrop} - ${getCropWeight(currentCrop)}kg Bag)` : "";
+  const currentRate = getCropRate(currentCrop);
+  $("currentCropBadge").textContent = (currentCrop && currentCrop !== "__UNASSIGNED__") ? `(${currentCrop} - ${getCropWeight(currentCrop)}kg Bag | Rate: ₹${currentRate}/Qtl)` : "";
 
-  const villages = [...new Set(records.map(r => getVillage(r.data)).filter(Boolean))].sort((a,b) => a.localeCompare(b));
-  const oldVillage = $("villageFilter").value;
-  $("villageFilter").innerHTML = '<option value="">सभी गाँव</option>';
-  villages.forEach(v => {
-    const op = document.createElement("option");
-    op.value = v; op.textContent = v;
-    $("villageFilter").appendChild(op);
-  });
-  $("villageFilter").value = villages.includes(oldVillage) ? oldVillage : "";
-
-  const allKeys = [...new Set(records.flatMap(r => Object.keys(r.data)))];
+  const allKeys = [...new Set(records.flatMap(r => Object.keys(r.data)))].filter(k => !k.startsWith("_"));
 
   const standard = [
     {title:"Customer Name", aliases:["Customer Name","Customer","Farmer Name","Name","Kisan Name","किसान नाम"]},
     {title:"Date", aliases:["Date","Gatepass Date","Gate Pass Date","दिनांक"]},
     {title:"Season Year", aliases:["Season Year","Season","SeasonYear","सीज़न"]},
     {title:"Crop", aliases:["Crop","Crop Name","फसल"]},
-    {title:"Village", aliases:["Village","Village Name","गाँव","गांव"]},
+    {title:"Village", aliases:["Village", "Village Name", "Farmer Village", "Address", "City", "गाँव", "गांव", "Gram", "Gaon", "पता"]},
+    {title:"Biometric", aliases:["Biometric","Biometric Status","बायोमेट्रिक","बायो"]},
+    {title:"Auction", aliases:["Auction","Auction Status","ऑक्शन","बोली","नीलामी","Nillami","Boli"]},
     {title:"Mobile No.", aliases:["Mobile No.","Mobile No","Mobile","Phone"]},
     {title:"Gatepass No.", aliases:["Gatepass No.","Gatepass No","Gate Pass No","Gatepass","GP No"]},
     {title:"Bore", aliases:["Bore","Bores","Bags","Bag","Bora","बोरे"]},
@@ -901,7 +1186,7 @@ function render() {
     const td = document.createElement("td");
     td.colSpan = cols.length + 1;
     td.className = "empty";
-    td.textContent = records.length ? "चयनित फसल / फिल्टर के लिए कोई रिकॉर्ड नहीं मिला।" : "Firebase में डेटा नहीं है।";
+    td.textContent = records.length ? "चयनित फिल्टर के लिए कोई रिकॉर्ड नहीं मिला।" : "Firebase में डेटा नहीं है।";
     tr.appendChild(td);
     tbody.appendChild(tr);
     $("tableFoot").innerHTML = "";
@@ -952,7 +1237,25 @@ function render() {
         value = (calc.rawQ === "" && calc.rawB === "" && calc.bore === 0) ? "" : fmt(calc.bore, 0);
       }
 
-      if (norm(c.title).includes("season")) {
+      if (norm(c.title).includes("biometric")) {
+        const nV = norm(value);
+        if (nV === "yes" || nV === "y" || nV === "true" || nV === "हाँ" || nV === "1") {
+          td.innerHTML = `<span class="badge-yes">✓ Yes</span>`;
+        } else if (nV === "no" || nV === "n" || nV === "false" || nV === "नहीं" || nV === "0") {
+          td.innerHTML = `<span class="badge-no">✗ No</span>`;
+        } else {
+          td.textContent = value ?? "";
+        }
+      } else if (norm(c.title).includes("auction")) {
+        const nV = norm(value);
+        if (nV === "yes" || nV === "done" || nV === "हाँ" || nV === "true" || nV === "1" || nV === "ok") {
+          td.innerHTML = `<span class="badge-yes">✓ Yes</span>`;
+        } else if (nV === "no" || nV === "pending" || nV === "नहीं" || nV === "false" || nV === "0") {
+          td.innerHTML = `<span class="badge-no">⏳ Pending</span>`;
+        } else {
+          td.textContent = value ?? "";
+        }
+      } else if (norm(c.title).includes("season")) {
         td.innerHTML = value ? `<span class="badge-season">${value}</span>` : `<span class="badge-none">N/A</span>`;
       } else if (norm(c.title).includes("crop")) {
         td.innerHTML = value ? `<span class="badge-crop">${value}</span>` : `<span class="badge-none">N/A</span>`;
@@ -1069,7 +1372,6 @@ $("excelFile").addEventListener("change", async e => {
   }
 });
 
-/* FIX: SMART UPSERT (NO RECORD DELETED, UPDATES CHANGED FIELDS LIKE BIOMETRIC & AUCTION) */
 $("uploadBtn").addEventListener("click", async () => {
   if (busy) return;
   if (!excelRows.length) { setUpload("⚠️ Excel चुनें।", true); return; }
@@ -1081,7 +1383,6 @@ $("uploadBtn").addEventListener("click", async () => {
     const snap = await recordsRef.once("value");
     const oldData = snap.val() || {};
 
-    // Map existing records by unique identifiers
     const existingById = new Map();
     const existingByGP = new Map();
 
@@ -1103,8 +1404,10 @@ $("uploadBtn").addEventListener("click", async () => {
     let updated = 0;
     let unchanged = 0;
     const seenExcel = new Set();
+    const nowTime = Date.now();
 
-    for (const row of excelRows) {
+    for (let i = 0; i < excelRows.length; i++) {
+      const row = excelRows[i];
       const rowCopy = { ...row };
       const rowId = identity(rowCopy);
       if (seenExcel.has(rowId)) continue;
@@ -1115,7 +1418,6 @@ $("uploadBtn").addEventListener("click", async () => {
       const c = norm(getCrop(rowCopy));
       const gpKey = gp ? `${gp}|${s}|${c}` : null;
 
-      // Find match via GP or full row signature
       let matched = null;
       if (gpKey && existingByGP.has(gpKey)) {
         matched = existingByGP.get(gpKey);
@@ -1123,8 +1425,9 @@ $("uploadBtn").addEventListener("click", async () => {
         matched = existingById.get(rowId);
       }
 
+      const entryTime = nowTime + i;
+
       if (matched) {
-        // Record pehle se hai -> Check if fields like Biometric, Auction, Qty badle hain
         const targetKey = matched.firebaseKey;
         const currentData = matched.data || {};
         let hasChanges = false;
@@ -1132,7 +1435,6 @@ $("uploadBtn").addEventListener("click", async () => {
 
         Object.entries(rowCopy).forEach(([fieldKey, newVal]) => {
           const oldVal = currentData[fieldKey];
-          // Naye value ko compare karein (empty strings ignore na ho agar actual change hai)
           if (String(newVal ?? "").trim() !== "" && String(newVal).trim() !== String(oldVal ?? "").trim()) {
             mergedRow[fieldKey] = newVal;
             hasChanges = true;
@@ -1140,19 +1442,21 @@ $("uploadBtn").addEventListener("click", async () => {
         });
 
         if (hasChanges) {
+          mergedRow._updatedAt = entryTime;
           updates[targetKey] = mergedRow;
-          matched.data = mergedRow; // In-memory sync for duplicates in same batch
+          matched.data = mergedRow;
           updated++;
         } else {
           unchanged++;
         }
       } else {
-        // Naya record hai -> Append new push
+        rowCopy._uploadedAt = entryTime;
+        rowCopy._updatedAt = entryTime;
+
         const ref = recordsRef.push();
         updates[ref.key] = rowCopy;
         added++;
 
-        // Add to map so next row in same file matches if identical
         const newRefObj = { firebaseKey: ref.key, data: rowCopy };
         existingById.set(rowId, newRefObj);
         if (gpKey) existingByGP.set(gpKey, newRefObj);
@@ -1160,16 +1464,17 @@ $("uploadBtn").addEventListener("click", async () => {
     }
 
     if (added === 0 && updated === 0) {
-      setUpload(`ℹ️ कोई बदलाव नहीं मिला (Unchanged: ${unchanged})`);
+      setUpload(`ℹ️ कोई नया बदलाव नहीं मिला (Unchanged: ${unchanged})`);
       showNotice("ℹ️ सभी रिकॉर्ड पहले से अप-टू-डेट हैं!");
       return;
     }
 
     await recordsRef.update(updates);
     
-    // Retain currently selected season & crop
     localStorage.setItem(LAST_SELECTED_SEASON_KEY, selSeason);
     localStorage.setItem(LAST_SELECTED_CROP_KEY, selCrop);
+
+    $("sortOrder").value = "uploadNewest";
 
     const msg = `✅ Added: ${added} | 🔄 Updated: ${updated} (Biometric/Auction etc.)`;
     setUpload(msg);
@@ -1185,7 +1490,7 @@ $("uploadBtn").addEventListener("click", async () => {
   }
 });
 
-/* SEASON & CROP MODAL MANAGEMENT */
+/* SEASON & CROP MODAL MANAGEMENT WITH RATE */
 $("manageMasterBtn").addEventListener("click", () => {
   isEditingMaster = false;
   $("masterModal").style.display = "flex";
@@ -1197,7 +1502,6 @@ $("closeMasterModal").addEventListener("click", () => {
   $("masterModal").style.display = "none";
 });
 
-// Helper to update existing records when a Season or Crop name is edited
 async function renameMasterInRecords(fieldType, oldVal, newVal) {
   if (!oldVal || !newVal || norm(oldVal) === norm(newVal) || !recordsRef) return;
   try {
@@ -1281,7 +1585,7 @@ function renderMasterModalLists() {
       const wtSmall = document.createElement("small");
       wtSmall.style.color = "var(--muted)";
       wtSmall.style.marginLeft = "4px";
-      wtSmall.textContent = `(${c.weightKg || 50} kg/bag)`;
+      wtSmall.textContent = `(${c.weightKg || 50} kg | ₹${c.rate || 0}/Qtl)`;
       infoDiv.appendChild(nameStrong);
       infoDiv.appendChild(wtSmall);
 
@@ -1426,34 +1730,41 @@ function openDeleteSeasonConfirm(container, idx) {
 
 function openEditCropRow(container, idx) {
   isEditingMaster = true;
-  const c = masterData.crops[idx] || { name: "", weightKg: 50 };
+  const c = masterData.crops[idx] || { name: "", weightKg: 50, rate: 0 };
   container.innerHTML = "";
 
   const inputWrap = document.createElement("div");
   inputWrap.style.display = "flex";
   inputWrap.style.gap = "4px";
   inputWrap.style.alignItems = "center";
+  inputWrap.style.flexWrap = "wrap";
 
   const nameInput = document.createElement("input");
   nameInput.type = "text";
   nameInput.value = c.name;
   nameInput.placeholder = "Crop Name";
-  nameInput.style.width = "110px";
+  nameInput.style.width = "95px";
   nameInput.style.padding = "4px 6px";
 
   const wtInput = document.createElement("input");
   wtInput.type = "number";
   wtInput.value = c.weightKg || 50;
   wtInput.step = "0.1";
-  wtInput.style.width = "65px";
+  wtInput.placeholder = "Kg";
+  wtInput.style.width = "55px";
   wtInput.style.padding = "4px 6px";
 
-  const kgLabel = document.createElement("small");
-  kgLabel.textContent = "kg";
+  const rateInput = document.createElement("input");
+  rateInput.type = "number";
+  rateInput.value = c.rate || 0;
+  rateInput.step = "1";
+  rateInput.placeholder = "Rate ₹";
+  rateInput.style.width = "65px";
+  rateInput.style.padding = "4px 6px";
 
   inputWrap.appendChild(nameInput);
   inputWrap.appendChild(wtInput);
-  inputWrap.appendChild(kgLabel);
+  inputWrap.appendChild(rateInput);
 
   const btnGroup = document.createElement("div");
   btnGroup.style.display = "flex";
@@ -1476,6 +1787,8 @@ function openEditCropRow(container, idx) {
   const doSaveCrop = async () => {
     const nameVal = nameInput.value.trim();
     const wtVal = Number(wtInput.value) || 50;
+    const rateVal = Number(rateInput.value) || 0;
+
     if (!nameVal) {
       showNotice("⚠️ कृपया फसल का नाम लिखें!");
       return;
@@ -1486,25 +1799,20 @@ function openEditCropRow(container, idx) {
       return;
     }
     const oldName = c.name;
-    masterData.crops[idx] = { name: nameVal, weightKg: wtVal };
+    masterData.crops[idx] = { name: nameVal, weightKg: wtVal, rate: rateVal };
     if ($("uploadCropSelect").value === oldName) $("uploadCropSelect").value = nameVal;
     if ($("cropFilter").value === oldName) $("cropFilter").value = nameVal;
 
     isEditingMaster = false;
     await saveMasterData();
     await renameMasterInRecords("crop", oldName, nameVal);
-    showNotice("✅ Crop Updated!");
+    showNotice("✅ Crop & Rate Updated!");
   };
 
   saveBtn.addEventListener("click", doSaveCrop);
-  nameInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") doSaveCrop();
-    if (e.key === "Escape") renderMasterModalLists();
-  });
-  wtInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") doSaveCrop();
-    if (e.key === "Escape") renderMasterModalLists();
-  });
+  nameInput.addEventListener("keydown", e => { if (e.key === "Enter") doSaveCrop(); });
+  wtInput.addEventListener("keydown", e => { if (e.key === "Enter") doSaveCrop(); });
+  rateInput.addEventListener("keydown", e => { if (e.key === "Enter") doSaveCrop(); });
   cancelBtn.addEventListener("click", () => renderMasterModalLists());
 
   btnGroup.appendChild(saveBtn);
@@ -1563,7 +1871,7 @@ function openDeleteCropConfirm(container, idx) {
 $("addSeasonBtn").addEventListener("click", async () => {
   const val = $("newSeasonInput").value.trim();
   if (!val) {
-    showNotice("⚠️ कृपया सीज़न (Season Year) लिखें!");
+    showNotice("⚠️ कृपया सीज़न लिखें!");
     return;
   }
   if (!masterData.seasons.some(s => norm(s) === norm(val))) {
@@ -1583,6 +1891,7 @@ $("newSeasonInput").addEventListener("keydown", e => {
 $("addCropBtn").addEventListener("click", async () => {
   const nameVal = $("newCropInput").value.trim();
   const weightVal = Number($("newCropWeightInput").value) || 50;
+  const rateVal = Number($("newCropRateInput").value) || 0;
 
   if (!nameVal) {
     showNotice("⚠️ कृपया फसल का नाम लिखें!");
@@ -1591,14 +1900,16 @@ $("addCropBtn").addEventListener("click", async () => {
   const idx = masterData.crops.findIndex(c => norm(c.name) === norm(nameVal));
 
   if (idx === -1) {
-    masterData.crops.push({ name: nameVal, weightKg: weightVal });
+    masterData.crops.push({ name: nameVal, weightKg: weightVal, rate: rateVal });
     showNotice("✅ Crop Added!");
   } else {
     masterData.crops[idx].weightKg = weightVal;
-    showNotice("✅ Crop Weight Updated!");
+    masterData.crops[idx].rate = rateVal;
+    showNotice("✅ Crop & Rate Updated!");
   }
 
   $("newCropInput").value = "";
+  $("newCropRateInput").value = "0";
   await saveMasterData();
 });
 
@@ -1647,13 +1958,356 @@ $("confirmDeleteBtn").addEventListener("click", async () => {
 $("exportBtn").addEventListener("click", () => {
   const list = getFiltered();
   if (!list.length) { showNotice("कोई डेटा नहीं है!"); return; }
-  const ws = XLSX.utils.json_to_sheet(list.map(r => ({...r.data})));
+  const cleanExport = list.map(r => {
+    const copy = { ...r.data };
+    delete copy._uploadedAt;
+    delete copy._updatedAt;
+    return copy;
+  });
+  const ws = XLSX.utils.json_to_sheet(cleanExport);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "GatePass");
   XLSX.writeFile(wb, "GatePass_Export.xlsx");
 });
 
-$("printBtn").addEventListener("click", () => window.print());
+$("printBtn").addEventListener("click", () => {
+  document.body.classList.remove("printing-summary");
+  window.print();
+});
+
+/* ========================================================
+   SUMMARY: MULTI-SEARCH & VIEW CHECKED SUPPORT
+   ======================================================== */
+$("summaryBtn").addEventListener("click", () => {
+  openSummaryModal();
+});
+
+$("closeSummaryModal").addEventListener("click", () => {
+  $("summaryModal").style.display = "none";
+});
+
+$("summaryCloseBtn").addEventListener("click", () => {
+  $("summaryModal").style.display = "none";
+});
+
+function openSummaryModal() {
+  const list = getFiltered();
+  $("summarySearchInput").value = "";
+  showCheckedOnly = false;
+  updateToggleCheckedBtnState();
+
+  if (!list.length) {
+    $("summaryContainer").innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">चयनित फिल्टर के लिए कोई डेटा नहीं है!</div>';
+    $("summaryFarmerCount").textContent = "0";
+    $("summaryTotalGP").textContent = "0";
+    $("summaryGrandAmount").textContent = "₹0";
+    $("summaryVillageFilter").innerHTML = '<option value="">सभी गाँव (All Villages)</option>';
+    $("summaryModal").style.display = "flex";
+    return;
+  }
+
+  // 1. Group records by UNIQUE Farmer Key (Name + Village + Mobile)
+  const farmerMap = new Map();
+  const summaryVillagesMap = new Map();
+
+  list.forEach(r => {
+    const rawName = getCustomer(r.data).replace(/\n/g, " ").trim() || "अज्ञात किसान";
+    const v = getVillage(r.data);
+    const m = getMobile(r.data);
+
+    if (v && v.trim()) {
+      const vClean = v.trim();
+      if (!summaryVillagesMap.has(norm(vClean))) {
+        summaryVillagesMap.set(norm(vClean), vClean);
+      }
+    }
+
+    const uniqueKey = norm(rawName) + "|" + norm(v) + "|" + norm(m);
+
+    if (!farmerMap.has(uniqueKey)) {
+      farmerMap.set(uniqueKey, {
+        uniqueKey: uniqueKey,
+        displayName: rawName,
+        village: v,
+        mobile: m,
+        items: [],
+        totalQty: 0,
+        totalBore: 0,
+        totalAmount: 0
+      });
+    }
+
+    const farmerObj = farmerMap.get(uniqueKey);
+    const calc = getCalculatedValues(r);
+
+    farmerObj.totalQty += calc.qty;
+    farmerObj.totalBore += calc.bore;
+    farmerObj.totalAmount += calc.amount;
+
+    farmerObj.items.push({
+      record: r,
+      gp: getGatepass(r.data) || "-",
+      date: shortDate(getDate(r.data)).replace(/\n/g, " "),
+      crop: getCrop(r.data) || "-",
+      village: v || farmerObj.village || "",
+      qty: calc.qty,
+      bore: calc.bore,
+      rate: calc.rate,
+      amount: calc.amount
+    });
+  });
+
+  currentSummaryFarmers = [...farmerMap.values()].sort((a,b) => a.displayName.localeCompare(b.displayName, 'hi'));
+
+  // Default: Keep previously checked or select all
+  if (!selectedSummaryFarmerKeys.size) {
+    selectedSummaryFarmerKeys = new Set(currentSummaryFarmers.map(f => f.uniqueKey));
+  } else {
+    // retain only valid keys
+    selectedSummaryFarmerKeys = new Set([...selectedSummaryFarmerKeys].filter(k => currentSummaryFarmers.some(f => f.uniqueKey === k)));
+  }
+
+  // 2. Populate filtered villages dropdown for Summary
+  const sortedVillages = [...summaryVillagesMap.values()].sort((a,b) => a.localeCompare(b, 'hi'));
+  let vHtml = '<option value="">सभी गाँव (All Villages)</option>';
+  sortedVillages.forEach(v => {
+    vHtml += `<option value="${v}">${v}</option>`;
+  });
+  $("summaryVillageFilter").innerHTML = vHtml;
+
+  renderSummaryCards();
+  $("summaryModal").style.display = "flex";
+}
+
+function updateToggleCheckedBtnState() {
+  const btn = $("summaryToggleCheckedBtn");
+  if (showCheckedOnly) {
+    btn.textContent = `📋 Show All (${currentSummaryFarmers.length})`;
+    btn.className = "orange";
+  } else {
+    btn.textContent = `👁️ Show Checked (${selectedSummaryFarmerKeys.size})`;
+    btn.className = "purple";
+  }
+}
+
+function renderSummaryCards() {
+  const container = $("summaryContainer");
+  container.innerHTML = "";
+
+  const searchRaw = $("summarySearchInput").value.trim();
+  // Support comma-separated multi queries: e.g. "Balbir, Mohit, Ramesh"
+  const searchQueries = searchRaw ? searchRaw.split(",").map(s => norm(s)).filter(Boolean) : [];
+  const selectedVillage = $("summaryVillageFilter").value;
+
+  let filteredFarmers = currentSummaryFarmers.filter(f => {
+    // Mode: Show only checked/ticked farmers
+    if (showCheckedOnly && !selectedSummaryFarmerKeys.has(f.uniqueKey)) {
+      return false;
+    }
+
+    // Village filter
+    if (selectedVillage) {
+      const fVillage = f.village || "";
+      const hasMatchingItemVillage = f.items.some(it => norm(it.village) === norm(selectedVillage));
+      if (norm(fVillage) !== norm(selectedVillage) && !hasMatchingItemVillage) {
+        return false;
+      }
+    }
+
+    // Multi-search query (matches ANY of the comma-separated terms)
+    if (searchQueries.length > 0) {
+      const isMatched = searchQueries.some(q => {
+        const nameMatch = norm(f.displayName).includes(q);
+        const villageMatch = norm(f.village || "").includes(q);
+        const mobileMatch = norm(f.mobile || "").includes(q);
+        const gpMatch = f.items.some(it => norm(it.gp).includes(q));
+        return nameMatch || villageMatch || mobileMatch || gpMatch;
+      });
+      if (!isMatched) return false;
+    }
+
+    return true;
+  });
+
+  // Calculate totals ONLY for selected (checked) farmers within current filtered view
+  let checkedFarmerCount = 0;
+  let totalGP = 0;
+  let grandTotalAmount = 0;
+
+  filteredFarmers.forEach(f => {
+    if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
+      checkedFarmerCount++;
+      totalGP += f.items.length;
+      grandTotalAmount += f.totalAmount;
+    }
+  });
+
+  $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
+  $("summaryTotalGP").textContent = totalGP;
+  $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
+  updateToggleCheckedBtnState();
+
+  const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
+  const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
+  const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
+  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
+
+  if (!filteredFarmers.length) {
+    container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">सर्च / फिल्टर के लिए कोई रिकॉर्ड नहीं मिला!</div>';
+    return;
+  }
+
+  // 3. Render Farmer Cards with Multi-Check Box
+  filteredFarmers.forEach((farmer, idx) => {
+    const isChecked = selectedSummaryFarmerKeys.has(farmer.uniqueKey);
+    const card = document.createElement("div");
+    card.className = "summary-farmer-card" + (isChecked ? "" : " unselected");
+
+    let rowsHtml = "";
+    farmer.items.forEach((item, itemIdx) => {
+      const cleanGP = item.gp.length > 17 ? item.gp.replace("GP-49-", "") : item.gp;
+
+      rowsHtml += `
+        <tr>
+          <td style="text-align:center;">${itemIdx + 1}</td>
+          <td style="font-weight:700; color:var(--brand); overflow:hidden; text-overflow:ellipsis;" title="${item.gp}">${cleanGP}</td>
+          <td style="text-align:center; font-size:10.5px;">${item.date}</td>
+          <td style="text-align:right; color:var(--purple); font-weight:700;">${item.bore ? fmt(item.bore, 0) : "-"}</td>
+          <td style="text-align:right; color:var(--green); font-weight:800;">${item.qty ? fmt(item.qty, 2) : "-"}</td>
+        </tr>
+      `;
+    });
+
+    card.innerHTML = `
+      <div class="summary-farmer-header">
+        <div style="flex:1; min-width:0; padding-right:6px; display:flex; align-items:flex-start; gap:8px;">
+          <input type="checkbox" class="summary-cb no-print" data-key="${farmer.uniqueKey}" ${isChecked ? "checked" : ""} style="width:16px; height:16px; margin-top:2px; cursor:pointer;">
+          <div>
+            <div class="farmer-title">${idx + 1}. 👤 ${farmer.displayName}</div>
+            <div class="farmer-sub">
+              ${farmer.village ? `🏡 ${farmer.village}` : ""}
+              ${farmer.mobile ? ` 📞 ${farmer.mobile}` : ""}
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right; white-space:nowrap;">
+          <div><span style="font-size:10.5px; color:var(--muted);">कुल GP:</span> <strong style="color:var(--brand); font-size:13px;">${farmer.items.length}</strong></div>
+          <div style="font-size:12px; color:var(--green); font-weight:800;">₹${fmt(farmer.totalAmount, 2)}</div>
+        </div>
+      </div>
+
+      <table class="summary-fit-table">
+        <thead>
+          <tr>
+            <th style="width:7%; text-align:center;">#</th>
+            <th style="width:40%;">Gatepass No.</th>
+            <th style="width:23%; text-align:center;">दिनांक</th>
+            <th style="width:13%; text-align:right;">बोरे</th>
+            <th style="width:17%; text-align:right;">क्विंटल</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align:right; font-weight:700; font-size:11px; color:var(--primary);">
+              कुल: ${fmt(farmer.totalBore, 0)} बोरे | ${fmt(farmer.totalQty, 2)} Qtl:
+            </td>
+            <td colspan="2" style="text-align:right; color:var(--green); font-weight:800; font-size:12px;">
+              ₹${fmt(farmer.totalAmount, 2)}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    // Multi-Check Checkbox change event
+    const cb = card.querySelector(".summary-cb");
+    cb.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        selectedSummaryFarmerKeys.add(farmer.uniqueKey);
+        card.classList.remove("unselected");
+      } else {
+        selectedSummaryFarmerKeys.delete(farmer.uniqueKey);
+        card.classList.add("unselected");
+      }
+      updateSummaryTotalsOnly(filteredFarmers);
+      updateToggleCheckedBtnState();
+    });
+
+    container.appendChild(card);
+  });
+}
+
+// Fast update of summary metrics without re-rendering whole list
+function updateSummaryTotalsOnly(filteredFarmers) {
+  let checkedFarmerCount = 0;
+  let totalGP = 0;
+  let grandTotalAmount = 0;
+
+  filteredFarmers.forEach(f => {
+    if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
+      checkedFarmerCount++;
+      totalGP += f.items.length;
+      grandTotalAmount += f.totalAmount;
+    }
+  });
+
+  $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
+  $("summaryTotalGP").textContent = totalGP;
+  $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
+
+  const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
+  const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
+  const selectedVillage = $("summaryVillageFilter").value;
+  const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
+  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
+}
+
+// Toggle View: Only Checked Farmers vs All Farmers
+$("summaryToggleCheckedBtn").addEventListener("click", () => {
+  if (!showCheckedOnly && selectedSummaryFarmerKeys.size === 0) {
+    showNotice("⚠️ पहले किसी किसान को टिक (Check) करें!");
+    return;
+  }
+  showCheckedOnly = !showCheckedOnly;
+  if (showCheckedOnly) {
+    $("summarySearchInput").value = ""; // Clear search to show all checked
+  }
+  renderSummaryCards();
+});
+
+// Multi-check Select All / Clear buttons in Summary
+$("summarySelectAllBtn").addEventListener("click", () => {
+  currentSummaryFarmers.forEach(f => selectedSummaryFarmerKeys.add(f.uniqueKey));
+  renderSummaryCards();
+});
+
+$("summaryClearBtn").addEventListener("click", () => {
+  selectedSummaryFarmerKeys.clear();
+  renderSummaryCards();
+});
+
+// In-Modal Search & Filter Event Listeners
+$("summarySearchInput").addEventListener("input", () => {
+  showCheckedOnly = false; // switch back to normal search view when typing
+  renderSummaryCards();
+});
+$("summaryVillageFilter").addEventListener("change", renderSummaryCards);
+
+// DIRECT PRINT PREVIEW FOR SUMMARY (Only prints checked farmers)
+$("summaryPrintBtn").addEventListener("click", () => {
+  if (selectedSummaryFarmerKeys.size === 0) {
+    showNotice("⚠️ कृपया कम से कम एक किसान को टिक (Check) करें!");
+    return;
+  }
+  document.body.classList.add("printing-summary");
+  window.print();
+  setTimeout(() => {
+    document.body.classList.remove("printing-summary");
+  }, 1000);
+});
 
 /* Sync & Retain Dropdowns */
 $("uploadSeasonSelect").addEventListener("change", (e) => {
@@ -1702,7 +2356,7 @@ $("cropFilter").addEventListener("change", (e) => {
   render();
 });
 
-["search","villageFilter","fromDate","toDate","sortOrder"].forEach(id => {
+["search","biometricFilter","auctionFilter","villageFilter","fromDate","toDate","sortOrder"].forEach(id => {
   const el = $(id);
   if (el) el.addEventListener(id === "search" ? "input" : "change", render);
 });
@@ -1711,10 +2365,12 @@ $("clearFilters").addEventListener("click", () => {
   $("search").value = ""; 
   $("seasonFilter").value = "";
   $("cropFilter").value = "";
+  $("biometricFilter").value = "";
+  $("auctionFilter").value = "";
   $("villageFilter").value = "";
   $("fromDate").value = "";
   $("toDate").value = "";
-  $("sortOrder").value = "newest";
+  $("sortOrder").value = "uploadNewest";
   render();
 });
 
