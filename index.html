@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="/J-form/manifest.json">
+<meta name="theme-color" content="#0f172a">
 <title>Saini Trading Company - Gate Pass & Payment Management</title>
 
 <!-- External Libraries -->
@@ -3734,6 +3736,15 @@ $("refreshBtn").addEventListener("click", async () => {
 });
 
 startFirebase();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/J-form/service-worker.js")
+      .then(() => console.log("Service Worker Registered"))
+      .catch(err => console.error("Service Worker Error:", err));
+  });
+}
 </script>
 </body>
 </html>
