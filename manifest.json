@@ -1,1 +1,12 @@
-
+{
+  "id": "/J-form/",
+  "name": "Saini Trading Company - J Form",
+  "short_name": "J Form",
+  "description": "Gate Pass and Farmer Payment Management",
+  "start_url": "/J-form/",
+  "scope": "/J-form/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f172a"
+}
