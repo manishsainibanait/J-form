@@ -1,12 +1,23 @@
-"icons": [
-  {
-    "src": "/J-form/icon-192-1.png",
-    "sizes": "192x192",
-    "type": "image/png"
-  },
-  {
-    "src": "/J-form/icon-512-1.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  }
-]
+
+{
+  "id": "/J-form/",
+  "name": "Saini Trading Company - Gate Pass",
+  "short_name": "J Form",
+  "start_url": "/J-form/index.html",
+  "scope": "/J-form/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/J-form/icon-192-1.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/J-form/icon-512-1.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
