@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Saini Trading Company - Gate Pass Management</title>
+<title>Saini Trading Company - Gate Pass & Payment Management</title>
 
 <!-- External Libraries -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- JSZip: Solves 'Bad compressed size' error permanently -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
 <style>
 :root {
@@ -162,6 +164,44 @@ th.col-date, td.col-date {
   font-size: 10px;
 }
 
+/* Payment Status Badges */
+.badge-pay-success {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 11px;
+  border: 1px solid #86efac;
+}
+.badge-pay-progress {
+  background: #fef3c7;
+  color: #b45309;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 11px;
+  border: 1px solid #fde68a;
+}
+.badge-pay-pending {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 11px;
+  border: 1px solid #cbd5e1;
+}
+.badge-pay-failed {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 11px;
+  border: 1px solid #fca5a5;
+}
+
 tfoot tr {
   position: sticky;
   bottom: 0;
@@ -221,7 +261,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   font-weight: 600;
 }
 
-/* 100% Fit Screen Summary Styles */
+/* Summary Styles */
 .summary-farmer-card {
   border: 1px solid #cbd5e1;
   border-radius: 7px;
@@ -285,9 +325,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   padding: 6px 3px;
 }
 
-/* ==========================================
-   PERFECT A4 PRINT VIEW MODAL STYLES
-   ========================================== */
+/* Perfect A4 Print View Modal Styles */
 #directPrintModal {
   display: none;
   position: fixed;
@@ -367,16 +405,14 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 }
 .btn-print-custom span { font-size: 14px; }
 
-/* Canvas that allows smooth horizontal and vertical scrolling */
 .custom-print-canvas {
   flex: 1;
   overflow: auto;
   padding: 14px 10px;
-  display: block; /* Block so left columns never get clipped */
+  display: block;
   text-align: left;
 }
 
-/* White Sheet Paper Container - Left-Aligned & Fixed Transform Origin */
 #customPrintSheet {
   background: #ffffff;
   color: #000000;
@@ -390,7 +426,6 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   transition: transform 0.1s ease;
 }
 
-/* Report Header Inside Paper */
 .sheet-header-title {
   text-align: center;
   margin-bottom: 10px;
@@ -410,7 +445,6 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   font-weight: 600;
 }
 
-/* Styled Report Table Inside Sheet */
 .custom-sheet-table {
   width: 100%;
   border-collapse: collapse;
@@ -453,7 +487,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
     size: landscape;
     margin: 6mm;
   }
-  header, .no-print, .top-section, #masterModal, #deleteModal, #msgBox, .custom-print-topbar { display:none!important; }
+  header, .no-print, .top-section, #masterModal, #deleteModal, #msgBox, .custom-print-topbar, #paymentModal, #payDeleteModal { display:none!important; }
   body { background:white; font-size:10px; zoom: 100%; -webkit-print-color-adjust: exact; }
   .container { padding:0; }
   .tablewrap { overflow:visible; max-height:none; border:none; }
@@ -519,7 +553,10 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
 <header>
   <h2>SAINI TRADING COMPANY</h2>
-  <p>Gate Pass System - 2026 Edition</p>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <button id="topOpenPaymentBtn" class="green" style="padding:5px 12px; font-size:12px; font-weight:800; border:1px solid #86efac; box-shadow:0 1px 4px rgba(0,0,0,0.2);">💳 Payment Dashboard</button>
+    <p>Gate Pass System - 2026 Edition</p>
+  </div>
 </header>
 
 <div class="container">
@@ -529,7 +566,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
     <!-- Card 1: Upload, Season & Crop Selection -->
     <div class="card">
-      <h3>📂 Excel Upload <button class="gray" id="refreshBtn" style="padding:2px 6px; font-size:10px;">🔄 Sync</button></h3>
+      <h3>📂 Gate Pass Excel Upload <button class="gray" id="refreshBtn" style="padding:2px 6px; font-size:10px;">🔄 Sync</button></h3>
       
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
         <div>
@@ -544,17 +581,18 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
       <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="padding:3px;">
-        <button id="uploadBtn" class="green" style="white-space:nowrap;">⬆️ Upload</button>
+        <button id="uploadBtn" class="green" style="white-space:nowrap;">⬆️ Upload GP</button>
       </div>
 
       <div class="actions">
+        <button id="openPaymentModalBtn" class="orange" style="font-weight:700;">💳 Payment Dashboard</button>
         <button id="summaryBtn" class="teal">📑 Gatepass Summary</button>
         <button id="exportBtn" class="purple">⬇️ Export</button>
         <button id="directPrintViewBtn" class="green">👁️ Print View (All)</button>
         <button id="printBtn" class="gray">🖨️ Print</button>
         <button id="manageMasterBtn" class="orange">⚙️ Season & Crop Manage</button>
       </div>
-      <div id="uploadStatus" class="status">फाइल चुनें...</div>
+      <div id="uploadStatus" class="status">गेट पास फाइल चुनें...</div>
     </div>
 
     <!-- Card 2: Stats -->
@@ -598,7 +636,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
           <label>ऑक्शन (Auction)</label>
           <select id="auctionFilter">
             <option value="">सभी (All)</option>
-            <option value="yes">Yes (हो चुका)</option>
+            <option value="yes">Yes (हो चुका / Done)</option>
             <option value="no">No (बाकी / Pending)</option>
           </select>
         </div>
@@ -632,7 +670,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
   </div>
 
-  <!-- Print Header for Main Table (Only visible when printing directly) -->
+  <!-- Print Header for Main Table -->
   <div class="print-header-visible" style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; text-align: center;">
     <h2 style="font-size: 18px; margin: 0;">SAINI TRADING COMPANY</h2>
     <p style="font-size: 13px; font-weight: bold; margin: 3px 0 0 0;">Gate Pass विवरण रिपोर्ट</p>
@@ -666,9 +704,149 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
 </div>
 
+<!-- ========================================================
+     PAYMENT DASHBOARD MODAL (DEDICATED SEPARATE STORAGE)
+     ======================================================== -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content" style="max-width: 1020px; width: 98%; height: 96vh; max-height: 96vh; display: flex; flex-direction: column; padding: 10px; overflow: hidden;">
+    
+    <!-- Modal Fixed Header -->
+    <div class="modal-header" style="border-bottom: 2px solid var(--brand); padding-bottom: 6px; margin-bottom:6px; flex-shrink: 0;">
+      <div>
+        <h3 style="font-size:15px; color:var(--brand); display:flex; align-items:center; gap:6px;">
+          💳 किसान पेमेंट ट्रैकर व डैशबोर्ड (Payment Dashboard)
+        </h3>
+        <p style="font-size:10.5px; color:var(--muted); margin-top:2px;">
+          पेमेंट Excel (जैसे j(2).xlsx) अपलोड करें। यह Gate Pass डेटा से 100% अलग सुरक्षित रहेगा।
+        </p>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <button id="togglePayControlsBtn" class="gray" style="font-size:10.5px; padding:3px 8px;">🔼 Hide Filters</button>
+        <span class="close-modal" id="closePaymentModal">&times;</span>
+      </div>
+    </div>
+
+    <!-- Collapsible Controls Container -->
+    <div id="payTopControlsContainer" style="flex-shrink: 0; transition: max-height 0.3s ease;">
+      <!-- Payment Upload Card -->
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; margin-bottom:6px;">
+        <div style="display:grid; grid-template-columns: 2fr auto; gap:6px; align-items:center;">
+          <div>
+            <label style="font-size:9.5px; font-weight:700;">📂 अपलोड पेमेंट EXCEL (BANK / TREASURY / J-FORM):</label>
+            <input type="file" id="paymentExcelFile" accept=".xlsx,.xls,.csv" style="padding:3px; font-size:11px; background:white;">
+          </div>
+          <div style="display:flex; gap:6px; align-items:flex-end;">
+            <button id="paymentUploadBtn" class="green" style="padding:5px 12px; font-weight:700; height:29px; font-size:11px;">⬆️ Upload Payment Excel</button>
+          </div>
+        </div>
+        <div id="paymentUploadStatus" class="status" style="margin-top:4px; font-size:10.5px; padding:3px 6px;">
+          पेमेंट वाली Excel फाइल चुनें (जैसे j(2).xlsx)...
+        </div>
+      </div>
+
+      <!-- Live Payment Counters -->
+      <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); gap:4px; margin-bottom:6px;">
+        <div class="stat-box" style="padding:4px;"><small style="font-size:9px;">कुल रिकॉर्ड्स</small><strong id="payStatTotal" style="font-size:12px;">0</strong></div>
+        <div class="stat-box" style="padding:4px;"><small style="font-size:9px;">✅ Success</small><strong id="payStatSuccess" style="color:var(--green); font-size:12px;">0</strong></div>
+        <div class="stat-box" style="padding:4px;"><small style="font-size:9px;">⏳ In Progress</small><strong id="payStatProgress" style="color:var(--orange); font-size:12px;">0</strong></div>
+        <div class="stat-box" style="padding:4px;"><small style="font-size:9px;">⌛ Pending</small><strong id="payStatPending" style="color:var(--muted); font-size:12px;">0</strong></div>
+        <div class="stat-box" style="padding:4px;"><small style="font-size:9px;">कुल पेड राशि</small><strong id="payStatPaidAmount" style="color:var(--green); font-size:11.5px;">₹0</strong></div>
+      </div>
+
+      <!-- Payment Dashboard Multi-Filters WITH MULTI-SEARCH & PERSISTENT DROPDOWNS -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap:5px; background:#f1f5f9; padding:6px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:6px;">
+        <div>
+          <label style="font-size:9px;">🔍 मल्टी-सर्च (नाम, नाम, GP)</label>
+          <input type="text" id="paySearchInput" placeholder="Mohit, Subhash..." style="padding:4px 6px; font-size:11px;">
+        </div>
+        <div>
+          <label style="font-size:9px;">📊 पेमेंट स्टेटस</label>
+          <select id="payStatusFilter" style="padding:4px; font-size:11px;">
+            <option value="">सभी स्टेटस (All)</option>
+            <option value="success">✅ Paid / Success</option>
+            <option value="progress">⏳ In Progress</option>
+            <option value="pending">⌛ Pending / Blank</option>
+            <option value="failed">❌ Failed / Hold</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9px;">🌾 सीज़न (Season)</label>
+          <select id="paySeasonFilter" style="padding:4px; font-size:11px;"><option value="">सभी सीज़न</option></select>
+        </div>
+        <div>
+          <label style="font-size:9px;">🌱 फसल (Crop)</label>
+          <select id="payCropFilter" style="padding:4px; font-size:11px;"><option value="">सभी फसलें</option></select>
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button id="payClearFilterBtn" class="gray" style="width:100%; height:26px; font-size:10px; padding:2px;">Clear Filter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Bar for Payment Table -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-shrink:0; flex-wrap:wrap; gap:4px;">
+      <div style="display:flex; gap:5px; align-items:center;">
+        <button id="paySelectAllBtn" class="gray" style="padding:3px 7px; font-size:10.5px;">✓ All</button>
+        <button id="payUnselectAllBtn" class="gray" style="padding:3px 7px; font-size:10.5px;">✗ Clear</button>
+        <button id="payDeleteSelectedBtn" class="red" style="padding:3px 8px; font-size:10.5px; font-weight:700;">🗑️ Delete (<span id="paySelectedCountDisplay">0</span>)</button>
+      </div>
+      <div style="display:flex; gap:5px; align-items:center;">
+        <button id="payPrintPreviewBtn" class="green" style="padding:3px 9px; font-size:10.5px; font-weight:700;">👁️ Print Preview</button>
+        <button id="payDirectPrintBtn" class="gray" style="padding:3px 7px; font-size:10.5px;">🖨️ Print</button>
+      </div>
+    </div>
+
+    <!-- FULL HEIGHT RESPONSIVE PAYMENT TABLE AREA -->
+    <div class="tablewrap" style="flex: 1 1 auto; height: 100%; min-height: 240px; max-height: none; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border);">
+      <table style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width:35px; text-align:center;"><input type="checkbox" id="payMasterCheckbox"></th>
+            <th style="width:30px; text-align:center;">#</th>
+            <th>किसान का नाम (Farmer)</th>
+            <th>J-Form / GP Number</th>
+            <th>मोबाइल (Mobile)</th>
+            <th style="text-align:right;">बोरे (Bags)</th>
+            <th style="text-align:right;">क्विंटल (Weight)</th>
+            <th style="text-align:right;">पेमेंट राशि (Amount)</th>
+            <th style="text-align:center;">पेमेंट स्टेटस</th>
+            <th>पेमेंट दिनांक (Date)</th>
+          </tr>
+        </thead>
+        <tbody id="paymentTableBody">
+          <tr><td colspan="10" class="empty">पेमेंट डेटा लोड हो रहा है...</td></tr>
+        </tbody>
+        <tfoot id="paymentTableFoot"></tfoot>
+      </table>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-shrink:0;">
+      <div style="font-size:11px; color:var(--muted);" id="paymentFooterInfo">
+        कुल रिकॉर्ड्स: 0
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button id="payExportBtn" class="purple" style="font-size:11px; padding:4px 8px;">⬇️ Export Excel</button>
+        <button id="closePaymentModalBottom" class="gray" style="font-size:11px; padding:4px 10px;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Delete Confirmation for Payment Records -->
+<div id="payDeleteModal" class="modal">
+  <div class="modal-content" style="max-width:380px; text-align:center;">
+    <h3 style="color:var(--red); margin-bottom:10px;">🗑️ Delete Payment Records</h3>
+    <p id="payDeleteConfirmText" style="margin-bottom:16px; font-weight:600; font-size:13px;"></p>
+    <div style="display:flex; justify-content:center; gap:10px;">
+      <button id="payConfirmDeleteBtn" class="red" style="padding:8px 16px;">Yes, Delete</button>
+      <button id="payCancelDeleteBtn" class="gray" style="padding:8px 16px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- SCREENSHOT EXACT MATCH: PRINT VIEW MODAL -->
 <div id="directPrintModal">
-  <!-- Top Bar with Cancel, Zoom Slider & Print Now -->
   <div class="custom-print-topbar no-print">
     <button type="button" class="btn-cancel-custom" id="customPrintCancelBtn">
       <span>Cancel</span>
@@ -687,11 +865,10 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
     </button>
   </div>
 
-  <!-- Sheet Canvas on Blue Slate Background -->
   <div class="custom-print-canvas" id="customPrintCanvas">
     <div id="customPrintSheet">
       <div class="sheet-header-title">
-        <h2>📂 Gate Pass Records Report</h2>
+        <h2 id="customPrintSheetTitle">📂 Gate Pass Records Report</h2>
         <p id="customSheetMetaText">Season: 2026 | Crop: All Crops | Total Entries: 0</p>
       </div>
       <div id="customSheetTableWrap" style="width:100%; overflow:visible;"></div>
@@ -743,7 +920,6 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
       <small id="summaryPrintMeta" style="color: #475569; font-size: 11px;"></small>
     </div>
 
-    <!-- Summary In-Modal Multi Search & Village Filter Bar -->
     <div class="summary-filter-bar no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px; background:#f1f5f9; padding:6px; border-radius:6px; border:1px solid #cbd5e1;">
       <div>
         <label style="font-size:9.5px; margin-bottom:1px;">🔍 Multi-Search (e.g. Balbir, Mohit)</label>
@@ -757,7 +933,6 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
       </div>
     </div>
 
-    <!-- Multi-Check and Print Controls Bar -->
     <div class="summary-actions-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #cbd5e1; gap:6px; flex-wrap:wrap;">
       <div style="font-size:11.5px; color:var(--primary); line-height: 1.4;">
         चुने किसान: <strong id="summaryFarmerCount">0</strong> | 
@@ -779,7 +954,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   </div>
 </div>
 
-<!-- Modal: Delete Confirmation -->
+<!-- Modal: Delete Confirmation (Main Gate Pass Table) -->
 <div id="deleteModal" class="modal">
   <div class="modal-content" style="max-width:380px; text-align:center;">
     <h3 style="color:var(--red); margin-bottom:10px;">🗑️ Delete Records</h3>
@@ -805,13 +980,17 @@ const firebaseConfig = {
 };
 
 const DB_PATH = "gatePassExcelRecords";
+const PAYMENT_DB_PATH = "farmerPaymentExcelRecords";
 const MASTER_PATH = "gatePassMasterData";
 const LOCAL_MASTER_KEY = "saini_gatepass_master_v1";
 const LAST_SELECTED_SEASON_KEY = "saini_last_selected_season";
 const LAST_SELECTED_CROP_KEY = "saini_last_selected_crop";
+const LAST_PAY_SEASON_KEY = "saini_last_pay_season";
+const LAST_PAY_CROP_KEY = "saini_last_pay_crop";
 
-let db, auth, recordsRef, masterRef;
+let db, auth, recordsRef, paymentRecordsRef, masterRef;
 let records = [];
+let paymentRecords = [];
 
 let masterData = {
   seasons: ["2026", "2025"],
@@ -837,6 +1016,7 @@ try {
 }
 
 let selectedKeys = new Set();
+let paySelectedKeys = new Set();
 let excelRows = [];
 let initialLoadDone = false;
 let busy = false;
@@ -846,6 +1026,9 @@ let isEditingMaster = false;
 let currentSummaryFarmers = [];
 let selectedSummaryFarmerKeys = new Set();
 let showCheckedOnly = false;
+
+// Temporary cache for uploaded payment Excel rows
+let paymentExcelRows = [];
 
 const $ = id => document.getElementById(id);
 
@@ -862,6 +1045,15 @@ function norm(v) {
     .replace(/[^a-z0-9\u0900-\u097f]/g, "");
 }
 
+/* SMART CORE NUMBER EXTRACTOR: Strips GP-, JF-, AUC- */
+function coreNumber(v) {
+  if (!v) return "";
+  let s = String(v).trim().toUpperCase();
+  s = s.replace(/^(GP|JF|AUC|JFORM|GATEPASS)[-_]?/i, "");
+  return norm(s);
+}
+
+/* FIREBASE KEY SANITIZER: Eliminates ., #, $, /, [, ] to avoid Firebase errors */
 function safeFieldName(v) {
   return String(v ?? "").trim()
     .replace(/[.#$/\[\]]/g, "_")
@@ -908,23 +1100,40 @@ function getVillage(r) {
   ]) ?? "").trim(); 
 }
 
-function getMobile(r) { return String(field(r, ["Mobile No.", "Mobile No", "Mobile", "Phone", "Mobile Number"]) ?? ""); }
+function getMobile(r) { 
+  const val = field(r, ["Mobile No.", "Mobile No", "Mobile", "Phone", "Mobile Number"]);
+  if (!val) return "";
+  const s = String(val).trim();
+  const m = s.match(/\d{10}/);
+  return m ? m[0] : s;
+}
+
 function getGatepass(r) {
   return String(field(r, [
     "GatePass Number",
     "Gate Pass Number",
     "Gatepass No.",
     "Gatepass No",
+    "Gatepass No_",
     "Gate Pass No",
     "Gatepass",
-    "GP No"
+    "GP No",
+    "J form Number",
+    "J Form Number",
+    "Jform Number",
+    "J-Form Number",
+    "Jform No",
+    "J-Form No",
+    "J Form",
+    "जे फार्म"
   ]) ?? "").trim();
 }
+
 function getSeason(r) { return String(field(r, ["Season Year", "Season", "SeasonYear", "सीज़न"]) ?? "").trim(); }
-function getCrop(r) { return String(field(r, ["Crop", "Crop Name", "फसल"]) ?? "").trim(); }
+function getCrop(r) { return String(field(r, ["Crop", "Crop Name", "Commodity Name", "फसल"]) ?? "").trim(); }
 function getBiometric(r) { return String(field(r, ["Biometric", "Biometric Status", "बायोमेट्रिक", "बायो"]) ?? "").trim(); }
 
-/* STRICT & EXACT AUCTION FIELD RETRIEVER */
+/* STRICT & EXACT AUCTION FIELD RETRIEVER (INCLUDES 'Status' COLUMN FROM GATE PASS EXCEL) */
 function getAuction(r) { 
   const val = field(r, [
     "Status", "Auction Status", "Auction", "Gatepass Status", "GP Status", 
@@ -937,8 +1146,75 @@ function getAuction(r) {
   return ""; 
 }
 
-function getRawQty(r) { return field(r, ["Gatepass Qty", "Gate Pass Qty", "Qty", "Quantity", "Qtl", "Quintal", "Net Qty", "क्विंटल"]); }
-function getRawBore(r) { return field(r, ["Bore", "Bores", "Bags", "Bag", "Bora", "Total Bags", "बोरे"]); }
+function isAuctionComplete(auctionRawVal) {
+  if (!auctionRawVal) return false;
+  const s = norm(auctionRawVal);
+  if (!s) return false;
+  
+  if (s === "pending" || s === "no" || s === "n" || s === "0" || s === "false" || s === "नहीं" || s === "baki" || s === "बाकी") {
+    return false;
+  }
+
+  return (s === "auctioned" || s === "auction" || s === "yes" || s === "y" || s === "done" || s === "true" || s === "हाँ" || s === "ha" || s === "1" || s === "ok" || s === "pass" || s === "complete");
+}
+
+/* PAYMENT SPECIFIC FIELDS & STATUS DETECTORS */
+function getPaymentStatus(r) {
+  const direct = field(r, [
+    "Payment Status", "PaymentStatus", "Payment", "Pay Status", "Status Payment", 
+    "पेमेंट स्टेटस", "भुगतान स्थिति", "Payment_Status", "Status"
+  ]);
+  return String(direct || "").trim();
+}
+
+function getPaymentAmount(r) {
+  const v = field(r, [
+    "Total Amount", "Payment Amount", "Paid Amount", "Paid Amt", "Payment Amt", "Pay Amount", 
+    "पेमेंट राशि", "भुगतान राशि", "Net Amount", "Amount Paid", "Total Amt", "Amount"
+  ]);
+  return v !== "" ? num(v) : null;
+}
+
+function getPaymentDate(r) {
+  const d = field(r, ["Payment Date", "Pay Date", "Paid Date", "पेमेंट दिनांक", "भुगतान दिनांक", "Auction Date", "Date"]);
+  return d ? isoDate(d) : "";
+}
+
+function normalizePaymentStatusType(rawStatus) {
+  if (!rawStatus) return "pending";
+  const s = norm(rawStatus);
+  if (s.includes("success") || s.includes("paid") || s.includes("done") || s.includes("cleared") || s.includes("complete") || s === "yes" || s === "ok" || s === "हाँ") {
+    return "success";
+  }
+  if (s.includes("progress") || s.includes("process") || s.includes("processing") || s.includes("pendingbank") || s.includes("initiated")) {
+    return "progress";
+  }
+  if (s.includes("fail") || s.includes("reject") || s.includes("error") || s.includes("declined") || s.includes("hold")) {
+    return "failed";
+  }
+  return "pending";
+}
+
+function renderPaymentBadge(rawStatus) {
+  const type = normalizePaymentStatusType(rawStatus);
+  if (type === "success") {
+    return `<span class="badge-pay-success">✅ Paid (${rawStatus || "Success"})</span>`;
+  }
+  if (type === "progress") {
+    return `<span class="badge-pay-progress">⏳ In Progress</span>`;
+  }
+  if (type === "failed") {
+    return `<span class="badge-pay-failed">❌ ${rawStatus || "Hold/Failed"}</span>`;
+  }
+  return `<span class="badge-pay-pending">⌛ Pending</span>`;
+}
+
+function getRawQty(r) { 
+  return field(r, ["Gatepass Qty", "Gate Pass Qty", "Qty", "Quantity", "Qtl", "Quintal", "Net Qty", "क्विंटल", "Lifted Weight", "Weight"]); 
+}
+function getRawBore(r) { 
+  return field(r, ["Bore", "Bores", "Bags", "Bag", "Bora", "Total Bags", "बोरे", "Lifted Bags"]); 
+}
 
 function isoDate(v) {
   if (!v) return "";
@@ -967,7 +1243,7 @@ function shortDate(v) {
   return parts.length === 3 ? `${parts[2]}/${parts[1]}\n${parts[0].slice(-2)}` : iso;
 }
 
-function getDate(r) { return isoDate(field(r, ["Date", "Gatepass Date", "Gate Pass Date", "J Form Date", "दिनांक"])); }
+function getDate(r) { return isoDate(field(r, ["Date", "Gatepass Date", "Gate Pass Date", "J Form Date", "Auction Date", "दिनांक"])); }
 
 function identity(r) {
   const gp = norm(getGatepass(r));
@@ -989,6 +1265,13 @@ function setUpload(msg, error=false) {
   $("uploadStatus").style.color = error ? "#991b1b" : "#1e40af";
 }
 
+function setPaymentUploadStatus(msg, error=false) {
+  const el = $("paymentUploadStatus");
+  el.textContent = msg;
+  el.style.background = error ? "#fef2f2" : "#eff6ff";
+  el.style.color = error ? "#991b1b" : "#1e40af";
+}
+
 function setBusy(v) {
   busy = v;
   $("busy").style.display = v ? "block" : "none";
@@ -1003,12 +1286,14 @@ async function startFirebase() {
     auth = firebase.auth();
     db = firebase.database();
     recordsRef = db.ref(DB_PATH);
+    paymentRecordsRef = db.ref(PAYMENT_DB_PATH);
     masterRef = db.ref(MASTER_PATH);
 
     if (!auth.currentUser) await auth.signInAnonymously();
 
     listenMasterData();
     listenRecords();
+    listenPaymentRecords();
     setConnection("🟢 Firebase Connected");
   } catch (e) {
     setConnection("❌ Conn Error: " + (e.message || e), true);
@@ -1089,6 +1374,7 @@ function listenMasterData() {
 function updateMasterDropdowns() {
   const uploadSeason = $("uploadSeasonSelect");
   const filterSeason = $("seasonFilter");
+  const paySeasonSelect = $("paySeasonFilter");
   
   let savedSeason = localStorage.getItem(LAST_SELECTED_SEASON_KEY);
   const curUploadS = uploadSeason.value || savedSeason || masterData.seasons[0] || "";
@@ -1098,6 +1384,15 @@ function updateMasterDropdowns() {
   filterSeason.innerHTML = '<option value="">सभी सीज़न</option>' +
     masterData.seasons.map(s => `<option value="${s}">${s}</option>`).join("") +
     '<option value="__UNASSIGNED__">Unassigned (पुराना डेटा)</option>';
+
+  if (paySeasonSelect) {
+    const savedPaySeason = localStorage.getItem(LAST_PAY_SEASON_KEY) || savedSeason || masterData.seasons[0] || "";
+    paySeasonSelect.innerHTML = '<option value="">सभी सीज़न</option>' +
+      masterData.seasons.map(s => `<option value="${s}">${s}</option>`).join("");
+    if (savedPaySeason && masterData.seasons.includes(savedPaySeason)) {
+      paySeasonSelect.value = savedPaySeason;
+    }
+  }
 
   if (curUploadS && masterData.seasons.includes(curUploadS)) {
     uploadSeason.value = curUploadS;
@@ -1110,6 +1405,7 @@ function updateMasterDropdowns() {
 
   const uploadCrop = $("uploadCropSelect");
   const filterCrop = $("cropFilter");
+  const payCropSelect = $("payCropFilter");
   let savedCrop = localStorage.getItem(LAST_SELECTED_CROP_KEY);
   const curUploadC = uploadCrop.value || savedCrop || (masterData.crops[0] ? masterData.crops[0].name : "");
   const curFilterC = filterCrop.value;
@@ -1118,6 +1414,15 @@ function updateMasterDropdowns() {
   filterCrop.innerHTML = '<option value="">सभी फसलें</option>' +
     masterData.crops.map(c => `<option value="${c.name}">${c.name}</option>`).join("") +
     '<option value="__UNASSIGNED__">Unassigned (पुराना डेटा)</option>';
+
+  if (payCropSelect) {
+    const savedPayCrop = localStorage.getItem(LAST_PAY_CROP_KEY) || "";
+    payCropSelect.innerHTML = '<option value="">सभी फसलें</option>' +
+      masterData.crops.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+    if (savedPayCrop && masterData.crops.some(c => c.name === savedPayCrop)) {
+      payCropSelect.value = savedPayCrop;
+    }
+  }
 
   if (curUploadC && masterData.crops.some(c => c.name === curUploadC)) {
     uploadCrop.value = curUploadC;
@@ -1139,10 +1444,26 @@ function listenRecords() {
     }));
     selectedKeys = new Set([...selectedKeys].filter(k => records.some(r => r.key === k)));
     initialLoadDone = true;
-    setConnection("🟢 Firebase Online (" + records.length + " Rows)");
+    setConnection("🟢 Firebase Online (" + records.length + " GatePass Rows)");
     updateDynamicFilterOptions();
     render();
   }, e => setConnection("❌ Load Error: " + e.message, true));
+}
+
+/* LISTEN TO COMPLETELY SEPARATE PAYMENT RECORDS */
+function listenPaymentRecords() {
+  paymentRecordsRef.off("value");
+  paymentRecordsRef.on("value", snapshot => {
+    const data = snapshot.val() || {};
+    paymentRecords = Object.entries(data).map(([key, value]) => ({
+      key,
+      data: value && typeof value === "object" ? value : {}
+    }));
+    paySelectedKeys = new Set([...paySelectedKeys].filter(k => paymentRecords.some(r => r.key === k)));
+    if ($("paymentModal").style.display === "flex") {
+      renderPaymentDashboard();
+    }
+  });
 }
 
 function updateDynamicFilterOptions() {
@@ -1239,19 +1560,6 @@ function getCalculatedValues(r) {
   return { qty: q, bore: b, rawQ, rawB, rate, amount };
 }
 
-/* 100% ACCURATE AUCTION CHECK FOR "AUCTIONED" AND "PENDING" */
-function isAuctionComplete(auctionRawVal) {
-  if (!auctionRawVal) return false;
-  const s = norm(auctionRawVal);
-  if (!s) return false;
-  
-  if (s === "pending" || s === "no" || s === "n" || s === "0" || s === "false" || s === "नहीं" || s === "baki" || s === "बाकी") {
-    return false;
-  }
-
-  return (s === "auctioned" || s === "auction" || s === "yes" || s === "y" || s === "done" || s === "true" || s === "हाँ" || s === "ha" || s === "1" || s === "ok" || s === "pass" || s === "complete");
-}
-
 function getFiltered() {
   const q = norm($("search").value);
   const season = $("seasonFilter").value;
@@ -1299,7 +1607,7 @@ function getFiltered() {
       if (biometric === "no" && isYes) return false;
     }
 
-    // STRICT AUCTION MATCHING
+    // STRICT AND 100% ACCURATE AUCTION FILTER
     if (auction) {
       const isDone = isAuctionComplete(rAucRaw);
       if (auction === "yes") {
@@ -1383,7 +1691,6 @@ function render() {
   const currentRate = getCropRate(currentCrop);
   $("currentCropBadge").textContent = (currentCrop && currentCrop !== "__UNASSIGNED__") ? `(${currentCrop} - ${getCropWeight(currentCrop)}kg Bag | Rate: ₹${currentRate}/Qtl)` : "";
 
-  // Prepare Print Header Meta
   const currentSeason = $("seasonFilter").value || "सभी सीज़न";
   const villageFilterVal = $("villageFilter").value ? ` | गाँव: ${$("villageFilter").value}` : "";
   const metaStr = `सीज़न: ${currentSeason} | फसल: ${currentCrop || "सभी"} | कुल रिकॉर्ड्स: ${filtered.length} | बोरे: ${fmt(totalBore, 0)} | क्विंटल: ${fmt(totalQty, 2)} ${villageFilterVal} | दिनांक: ${new Date().toLocaleDateString("en-IN")}`;
@@ -1396,14 +1703,14 @@ function render() {
     {title:"Customer Name", aliases:["Customer Name","Customer","Farmer Name","Name","Kisan Name","किसान नाम"]},
     {title:"Date", aliases:["Date","Gatepass Date","Gate Pass Date","दिनांक"]},
     {title:"Season Year", aliases:["Season Year","Season","SeasonYear","सीज़न"]},
-    {title:"Crop", aliases:["Crop","Crop Name","फसल"]},
+    {title:"Crop", aliases:["Crop","Crop Name","Commodity Name","फसल"]},
     {title:"Village", aliases:["Village", "Village Name", "Farmer Village", "Address", "City", "गाँव", "गांव", "Gram", "Gaon", "पता"]},
     {title:"Biometric", aliases:["Biometric","Biometric Status","बायोमेट्रिक","बायो"]},
-    {title:"Auction", aliases:["Status","Auction Status","Auction","Gatepass Status","GP Status","ऑक्शन","बोली","नीलामी","Nillami","Boli","Auction Done","Auction Pending"]},
-    {title:"Mobile No.", aliases:["Mobile No.","Mobile No","Mobile","Phone"]},
+    {title:"Status", aliases:["Status","Auction Status","Auction","Gatepass Status","GP Status","ऑक्शन","बोली","नीलामी","Nillami","Boli","Auction Done","Auction Pending"]},
+    {title:"Mobile No.", aliases:["Mobile No.","Mobile No","Mobile","Phone", "Mobile Number"]},
     {title:"Gatepass No.", aliases:["Gatepass No.","Gatepass No","Gate Pass No","Gatepass","GP No"]},
-    {title:"Bore", aliases:["Bore","Bores","Bags","Bag","Bora","बोरे"]},
-    {title:"Qty (Quintal)", aliases:["Gatepass Qty","Gate Pass Qty","Qty","Quantity","Qtl","Quintal","क्विंटल"]}
+    {title:"Bore", aliases:["Bore","Bores","Bags","Bag","Bora","बोरे","Lifted Bags"]},
+    {title:"Qty (Quintal)", aliases:["Gatepass Qty","Gate Pass Qty","Qty","Quantity","Qtl","Quintal","क्विंटल","Lifted Weight"]}
   ];
 
   let rawCols = standard.map(c => {
@@ -1415,7 +1722,7 @@ function render() {
     if (!rawCols.some(c => norm(c.key) === norm(k))) rawCols.push({title:k,key:k});
   });
 
-  const hiddenCols = ["seasonyear", "season", "सीज़न", "crop", "cropname", "फसल", "arthiya", "arthiyaname", "firm", "arthiyadetails", "आढ़तिया"];
+  const hiddenCols = ["seasonyear", "season", "सीज़न", "crop", "cropname", "commodityname", "फसल", "arthiya", "arthiyaname", "firm", "arthiyadetails", "aarthiyadetails", "आढ़तिया"];
 
   const cols = rawCols.filter((c, idx) => {
     if (idx === 0) return true;
@@ -1573,7 +1880,7 @@ function applySelectedSeasonAndCropToRows(rowsList) {
   const selSeason = $("uploadSeasonSelect").value;
   const selCrop = $("uploadCropSelect").value;
   const seasonAliases = ["seasonyear", "season", "सीज़न"];
-  const cropAliases = ["crop", "cropname", "फसल"];
+  const cropAliases = ["crop", "cropname", "commodityname", "फसल"];
 
   rowsList.forEach(row => {
     Object.keys(row).forEach(k => {
@@ -1607,6 +1914,99 @@ function isValidCustomerRow(row) {
   return true;
 }
 
+/* ROBUST EXCEL / HTML / CSV STREAMING FILE READER WITH JSZIP */
+async function parseAnyExcelFile(file) {
+  let workbook = null;
+  const readOpts = { dense: true, cellDates: true };
+
+  if (window.JSZip) {
+    try {
+      const zip = await JSZip.loadAsync(file);
+      const cleanBuffer = await zip.generateAsync({ type: "arraybuffer", compression: "DEFLATE" });
+      workbook = XLSX.read(cleanBuffer, { type: "array", ...readOpts });
+    } catch (eZip) {
+      console.warn("JSZip pass skipped or failed:", eZip);
+    }
+  }
+
+  if (!workbook) {
+    try {
+      const buffer = await file.arrayBuffer();
+      workbook = XLSX.read(buffer, { type: "array", ...readOpts });
+    } catch (err1) {
+      console.warn("ArrayBuffer read fallback...", err1);
+    }
+  }
+
+  if (!workbook) {
+    try {
+      const binaryStr = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsBinaryString(file);
+      });
+      workbook = XLSX.read(binaryStr, { type: "binary", ...readOpts });
+    } catch (err2) {
+      console.warn("Binary read fallback...", err2);
+    }
+  }
+
+  if (!workbook) {
+    const textStr = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
+    workbook = XLSX.read(textStr, { type: "string", ...readOpts });
+  }
+
+  const firstSheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[firstSheetName];
+
+  const rawMatrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: true });
+  if (!rawMatrix || !rawMatrix.length) return [];
+
+  let headerRowIndex = 0;
+  for (let i = 0; i < Math.min(rawMatrix.length, 15); i++) {
+    const row = rawMatrix[i] || [];
+    const joined = row.map(v => norm(v)).join(" ");
+    if (
+      (joined.includes("farmer") && joined.includes("name")) ||
+      joined.includes("customer") ||
+      joined.includes("jform") ||
+      joined.includes("gatepass") ||
+      (joined.includes("lifted") && joined.includes("bags"))
+    ) {
+      headerRowIndex = i;
+      break;
+    }
+  }
+
+  const rawHeaders = (rawMatrix[headerRowIndex] || []).map(h => String(h || "").trim());
+  const finalHeaders = rawHeaders.map((h, idx) => {
+    const safeH = safeFieldName(h);
+    return safeH && safeH !== "Column" ? safeH : `Col_${idx + 1}`;
+  });
+
+  const parsedRows = [];
+  for (let r = headerRowIndex + 1; r < rawMatrix.length; r++) {
+    const rowData = rawMatrix[r] || [];
+    if (!rowData.some(cell => String(cell ?? "").trim() !== "")) continue;
+
+    const rowObj = {};
+    finalHeaders.forEach((colKey, cIdx) => {
+      let val = rowData[cIdx] !== undefined ? rowData[cIdx] : "";
+      if (norm(colKey).includes("date")) val = isoDate(val);
+      rowObj[colKey] = val;
+    });
+    parsedRows.push(rowObj);
+  }
+
+  return parsedRows;
+}
+
 $("excelFile").addEventListener("click", e => {
   e.target.value = "";
 });
@@ -1617,10 +2017,7 @@ $("excelFile").addEventListener("change", async e => {
   if (!file) return;
 
   try {
-    const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer, {type:"array", cellDates:true});
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet, {defval:"", raw:true});
+    const rows = await parseAnyExcelFile(file);
 
     if (!rows.length) { setUpload("❌ Excel खाली है।", true); return; }
 
@@ -1711,7 +2108,7 @@ $("uploadBtn").addEventListener("click", async () => {
         Object.entries(rowCopy).forEach(([fieldKey, newVal]) => {
           const oldVal = currentData[fieldKey];
           if (newVal !== undefined && newVal !== null && String(newVal).trim() !== String(oldVal ?? "").trim()) {
-            mergedRow[fieldKey] = newVal;
+            mergedRow[safeFieldName(fieldKey)] = newVal;
             hasChanges = true;
           }
         });
@@ -1729,10 +2126,15 @@ $("uploadBtn").addEventListener("click", async () => {
         rowCopy._updatedAt = entryTime;
 
         const ref = recordsRef.push();
-        updates[ref.key] = rowCopy;
+        const safeRow = {};
+        Object.entries(rowCopy).forEach(([k,v]) => {
+          safeRow[safeFieldName(k)] = v;
+        });
+
+        updates[ref.key] = safeRow;
         added++;
 
-        const newRefObj = { firebaseKey: ref.key, data: rowCopy };
+        const newRefObj = { firebaseKey: ref.key, data: safeRow };
         existingById.set(rowId, newRefObj);
         if (gpKey) existingByGP.set(gpKey, newRefObj);
       }
@@ -1765,7 +2167,537 @@ $("uploadBtn").addEventListener("click", async () => {
   }
 });
 
-/* SEASON & CROP MODAL MANAGEMENT WITH RATE */
+/* ========================================================
+   SEPARATE PAYMENT EXCEL UPLOAD (100% DEDUPLICATED BY J-FORM)
+   ======================================================== */
+$("paymentExcelFile").addEventListener("click", e => { e.target.value = ""; });
+
+$("paymentExcelFile").addEventListener("change", async e => {
+  paymentExcelRows = [];
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    setPaymentUploadStatus("⏳ फाइल लोड हो रही है...");
+    const rows = await parseAnyExcelFile(file);
+
+    if (!rows.length) { setPaymentUploadStatus("❌ Payment Excel खाली है।", true); return; }
+
+    // STRICT VALIDATION: Filter out Grand Total / blank footer rows to prevent 'अज्ञात किसान'
+    paymentExcelRows = rows.map(r => {
+      const clean = {};
+      Object.entries(r).forEach(([k,v]) => {
+        let value = v;
+        if (norm(k).includes("date")) value = isoDate(v);
+        clean[safeFieldName(k)] = value === undefined || value === null ? "" : value;
+      });
+      return clean;
+    }).filter(r => isValidCustomerRow(r) && (getGatepass(r) || getPaymentAmount(r) > 0));
+
+    const curPaySeason = $("paySeasonFilter").value || localStorage.getItem(LAST_PAY_SEASON_KEY) || "2026";
+    const curPayCrop = $("payCropFilter").value || localStorage.getItem(LAST_PAY_CROP_KEY) || "Paddy";
+
+    setPaymentUploadStatus(`📄 Payment Sheet तैयार (${paymentExcelRows.length} पंक्तियाँ | ${curPaySeason} - ${curPayCrop})।`);
+  } catch (err) {
+    setPaymentUploadStatus("❌ Payment Sheet पढ़ने में त्रुटि: " + err.message, true);
+  }
+});
+
+$("paymentUploadBtn").addEventListener("click", async () => {
+  if (busy) return;
+  if (!paymentExcelRows.length) {
+    setPaymentUploadStatus("⚠️ पहले Payment Excel फाइल चुनें!", true);
+    return;
+  }
+
+  setBusy(true);
+  try {
+    setPaymentUploadStatus("⏳ पेमेंट डेटा सेव किया जा रहा है...");
+    
+    const snap = await paymentRecordsRef.once("value");
+    const oldPayments = snap.val() || {};
+
+    // Map existing payment records by Unique J-Form Core Number
+    const existingPaymentMap = new Map();
+    const existingByFarmerAmount = new Map();
+
+    Object.entries(oldPayments).forEach(([key, rec]) => {
+      if (!rec || typeof rec !== "object") return;
+      // Clean up any old garbage "अज्ञात किसान" rows automatically
+      if (!isValidCustomerRow(rec)) {
+        paymentRecordsRef.child(key).remove();
+        return;
+      }
+
+      const jfCore = coreNumber(rec["J_Form_Number"] || getGatepass(rec));
+      if (jfCore) {
+        existingPaymentMap.set(jfCore, key);
+      }
+      const farmer = norm(getCustomer(rec));
+      const amt = num(rec["Payment Amount"] || getPaymentAmount(rec));
+      if (farmer && amt > 0) {
+        existingByFarmerAmount.set(`${farmer}|${amt}`, key);
+      }
+    });
+
+    const updates = {};
+    let added = 0;
+    let updated = 0;
+    const nowTime = Date.now();
+
+    const selectedPaySeason = $("paySeasonFilter").value || localStorage.getItem(LAST_PAY_SEASON_KEY) || "2026";
+    const selectedPayCrop = $("payCropFilter").value || localStorage.getItem(LAST_PAY_CROP_KEY) || "Paddy";
+
+    for (let i = 0; i < paymentExcelRows.length; i++) {
+      const pRow = paymentExcelRows[i];
+      if (!isValidCustomerRow(pRow)) continue; // Never insert Grand Total rows
+
+      const jfRaw = getGatepass(pRow);
+      const jfCore = coreNumber(jfRaw);
+      const farmer = norm(getCustomer(pRow));
+      const amt = num(getPaymentAmount(pRow));
+
+      let targetKey = null;
+      if (jfCore && existingPaymentMap.has(jfCore)) {
+        targetKey = existingPaymentMap.get(jfCore);
+      } else if (farmer && amt > 0 && existingByFarmerAmount.has(`${farmer}|${amt}`)) {
+        targetKey = existingByFarmerAmount.get(`${farmer}|${amt}`);
+      }
+
+      const safeRow = {};
+      Object.entries(pRow).forEach(([k, v]) => {
+        safeRow[safeFieldName(k)] = v;
+      });
+
+      safeRow["Customer Name"] = getCustomer(pRow);
+      safeRow["J_Form_Number"] = jfRaw;
+      safeRow["Payment Status"] = getPaymentStatus(pRow) || "success";
+      safeRow["Payment Amount"] = amt;
+      safeRow["Lifted Bags"] = field(pRow, ["Lifted Bags", "Bore", "Bags"]) || "";
+      safeRow["Lifted Weight"] = field(pRow, ["Lifted Weight", "Weight", "Qty"]) || "";
+      safeRow["Payment Date"] = getPaymentDate(pRow) || isoDate(new Date());
+      safeRow["Season Year"] = selectedPaySeason;
+      safeRow["Crop"] = selectedPayCrop;
+
+      if (targetKey) {
+        safeRow["_updatedAt"] = nowTime + i;
+        updates[targetKey] = safeRow;
+        updated++;
+      } else {
+        const ref = paymentRecordsRef.push();
+        safeRow["_uploadedAt"] = nowTime + i;
+        safeRow["_updatedAt"] = nowTime + i;
+        updates[ref.key] = safeRow;
+        added++;
+        if (jfCore) existingPaymentMap.set(jfCore, ref.key);
+      }
+    }
+
+    await paymentRecordsRef.update(updates);
+
+    const successMsg = `✅ पेमेंट Excel सेव सफल! (कुल लोड: ${paymentExcelRows.length} | नए जुड़े: ${added} | अपडेट: ${updated})`;
+    setPaymentUploadStatus(successMsg);
+    showNotice(successMsg);
+    $("paymentExcelFile").value = "";
+    paymentExcelRows = [];
+  } catch (err) {
+    setPaymentUploadStatus("❌ पेमेंट सेव त्रुटि: " + err.message, true);
+    console.error(err);
+  } finally {
+    setBusy(false);
+  }
+});
+
+/* ========================================================
+   PAYMENT DASHBOARD RENDERING & MULTI-SEARCH FILTERING
+   ======================================================== */
+function openPaymentDashboard() {
+  $("paymentModal").style.display = "flex";
+  renderPaymentDashboard();
+}
+
+$("topOpenPaymentBtn").addEventListener("click", openPaymentDashboard);
+$("openPaymentModalBtn").addEventListener("click", openPaymentDashboard);
+$("closePaymentModal").addEventListener("click", () => { $("paymentModal").style.display = "none"; });
+$("closePaymentModalBottom").addEventListener("click", () => { $("paymentModal").style.display = "none"; });
+
+let payControlsVisible = true;
+$("togglePayControlsBtn").addEventListener("click", () => {
+  payControlsVisible = !payControlsVisible;
+  $("payTopControlsContainer").style.display = payControlsVisible ? "block" : "none";
+  $("togglePayControlsBtn").textContent = payControlsVisible ? "🔼 Hide Filters" : "🔽 Show Filters";
+});
+
+function getFilteredPaymentRecords() {
+  const rawSearch = $("paySearchInput").value.trim();
+  const searchQueries = rawSearch ? rawSearch.split(",").map(s => norm(s)).filter(Boolean) : [];
+  const statusFilter = $("payStatusFilter").value;
+  const seasonFilter = $("paySeasonFilter").value;
+  const cropFilter = $("payCropFilter").value;
+
+  return paymentRecords.filter(r => {
+    const d = r.data;
+    if (!isValidCustomerRow(d)) return false; // Hide any accidental total rows
+
+    const name = norm(getCustomer(d));
+    const jf = norm(d["J_Form_Number"] || getGatepass(d) || "");
+    const m = norm(getMobile(d));
+    const season = norm(getSeason(d));
+    const crop = norm(getCrop(d));
+    const pStatusRaw = getPaymentStatus(d);
+    const pType = normalizePaymentStatusType(pStatusRaw);
+
+    if (seasonFilter && season !== norm(seasonFilter)) return false;
+    if (cropFilter && crop !== norm(cropFilter)) return false;
+    if (statusFilter && pType !== statusFilter) return false;
+
+    if (searchQueries.length > 0) {
+      const isMatched = searchQueries.some(q => {
+        return name.includes(q) || jf.includes(q) || m.includes(q) || norm(pStatusRaw).includes(q);
+      });
+      if (!isMatched) return false;
+    }
+
+    return true;
+  });
+}
+
+function updatePaymentSelectedCountDisplay() {
+  const countEl = $("paySelectedCountDisplay");
+  if (countEl) countEl.textContent = paySelectedKeys.size;
+}
+
+function renderPaymentDashboard() {
+  const validPayments = paymentRecords.filter(r => isValidCustomerRow(r.data));
+  let totalRecords = validPayments.length;
+  let successCount = 0;
+  let progressCount = 0;
+  let pendingCount = 0;
+  let totalPaidAmount = 0;
+
+  validPayments.forEach(r => {
+    const rawSt = getPaymentStatus(r.data);
+    const type = normalizePaymentStatusType(rawSt);
+    const pAmt = getPaymentAmount(r.data) || 0;
+
+    if (type === "success") {
+      successCount++;
+      totalPaidAmount += pAmt;
+    } else if (type === "progress") {
+      progressCount++;
+    } else {
+      pendingCount++;
+    }
+  });
+
+  $("payStatTotal").textContent = totalRecords;
+  $("payStatSuccess").textContent = successCount;
+  $("payStatProgress").textContent = progressCount;
+  $("payStatPending").textContent = pendingCount;
+  $("payStatPaidAmount").textContent = "₹" + fmt(totalPaidAmount, 2);
+
+  const filteredPayList = getFilteredPaymentRecords();
+  const tbody = $("paymentTableBody");
+  tbody.innerHTML = "";
+
+  const masterCb = $("payMasterCheckbox");
+  if (masterCb) {
+    masterCb.checked = filteredPayList.length > 0 && filteredPayList.every(r => paySelectedKeys.has(r.key));
+  }
+
+  updatePaymentSelectedCountDisplay();
+
+  if (!filteredPayList.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="empty">${validPayments.length ? "फिल्टर के अनुसार कोई पेमेंट रिकॉर्ड नहीं मिला।" : "अभी कोई पेमेंट Excel अपलोड नहीं है। कृपया ऊपर से अपलोड करें।"}</td></tr>`;
+    $("paymentTableFoot").innerHTML = "";
+    $("paymentFooterInfo").textContent = `दिख रहे रिकॉर्ड्स: 0 / कुल पेमेंट: ${validPayments.length}`;
+    return;
+  }
+
+  let subtotalBags = 0;
+  let subtotalQty = 0;
+  let subtotalAmount = 0;
+
+  filteredPayList.forEach((r, idx) => {
+    const d = r.data;
+    const farmer = getCustomer(d).replace(/\n/g, " ");
+    const jf = d["J_Form_Number"] || getGatepass(d) || "-";
+    const mob = getMobile(d) || "-";
+    const bags = num(field(d, ["Lifted Bags", "Bore", "Bags"]));
+    const weight = num(field(d, ["Lifted Weight", "Weight", "Qty"]));
+    const pStatusRaw = getPaymentStatus(d);
+    const pAmt = getPaymentAmount(d) || 0;
+    const pDate = getPaymentDate(d) || "-";
+
+    subtotalBags += bags;
+    subtotalQty += weight;
+    subtotalAmount += pAmt;
+
+    const tr = document.createElement("tr");
+    const isChecked = paySelectedKeys.has(r.key);
+
+    tr.innerHTML = `
+      <td style="text-align:center;"><input type="checkbox" class="pay-row-cb" data-key="${r.key}" ${isChecked ? "checked" : ""}></td>
+      <td style="text-align:center;">${idx + 1}</td>
+      <td style="font-weight:700; color:var(--brand); white-space:nowrap;">${farmer}</td>
+      <td style="font-weight:700; white-space:nowrap; color:#0369a1;">${jf}</td>
+      <td>${mob}</td>
+      <td style="text-align:right; color:var(--purple); font-weight:700;">${bags ? fmt(bags, 0) : "-"}</td>
+      <td style="text-align:right; color:var(--green); font-weight:700;">${weight ? fmt(weight, 2) : "-"}</td>
+      <td style="text-align:right; font-weight:800; color:var(--primary);">₹${fmt(pAmt, 2)}</td>
+      <td style="text-align:center;">${renderPaymentBadge(pStatusRaw)}</td>
+      <td style="color:#64748b;">${pDate}</td>
+    `;
+
+    const rowCb = tr.querySelector(".pay-row-cb");
+    rowCb.addEventListener("change", (e) => {
+      if (e.target.checked) paySelectedKeys.add(r.key);
+      else paySelectedKeys.delete(r.key);
+      updatePaymentSelectedCountDisplay();
+      if (masterCb) masterCb.checked = filteredPayList.every(x => paySelectedKeys.has(x.key));
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  $("paymentTableFoot").innerHTML = `
+    <tr>
+      <td colspan="5" style="text-align:right; font-weight:800;">दिख रहे रिकॉर्ड्स का कुल योग:</td>
+      <td style="text-align:right; color:var(--purple); font-weight:800;">${fmt(subtotalBags, 0)}</td>
+      <td style="text-align:right; color:var(--green); font-weight:800;">${fmt(subtotalQty, 2)} Qtl</td>
+      <td style="text-align:right; font-weight:800; color:var(--primary);">₹${fmt(subtotalAmount, 2)}</td>
+      <td colspan="2"></td>
+    </tr>
+  `;
+
+  $("paymentFooterInfo").textContent = `दिख रहे रिकॉर्ड्स: ${filteredPayList.length} / कुल पेमेंट: ${validPayments.length}`;
+}
+
+$("payMasterCheckbox").addEventListener("change", (e) => {
+  const filtered = getFilteredPaymentRecords();
+  filtered.forEach(r => {
+    if (e.target.checked) paySelectedKeys.add(r.key);
+    else paySelectedKeys.delete(r.key);
+  });
+  renderPaymentDashboard();
+});
+
+$("paySelectAllBtn").addEventListener("click", () => {
+  const filtered = getFilteredPaymentRecords();
+  filtered.forEach(r => paySelectedKeys.add(r.key));
+  renderPaymentDashboard();
+});
+
+$("payUnselectAllBtn").addEventListener("click", () => {
+  paySelectedKeys.clear();
+  renderPaymentDashboard();
+});
+
+// Delete ONLY deletes from Payment Database (GatePass Database is untouched)
+$("payDeleteSelectedBtn").addEventListener("click", () => {
+  if (busy) return;
+  if (!paySelectedKeys.size) {
+    showNotice("⚠️ कृपया कम से कम एक पेमेंट रिकॉर्ड चुनें!");
+    return;
+  }
+  $("payDeleteConfirmText").textContent = `क्या आप चुने हुए ${paySelectedKeys.size} पेमेंट रिकॉर्ड डिलीट करना चाहते हैं? (Gate Pass सुरक्षित रहेगा)`;
+  $("payDeleteModal").style.display = "flex";
+});
+
+$("payCancelDeleteBtn").addEventListener("click", () => {
+  $("payDeleteModal").style.display = "none";
+});
+
+$("payConfirmDeleteBtn").addEventListener("click", async () => {
+  $("payDeleteModal").style.display = "none";
+  if (!paySelectedKeys.size) return;
+
+  setBusy(true);
+  const keys = [...paySelectedKeys];
+  try {
+    const updates = {};
+    keys.forEach(k => updates[k] = null);
+    await paymentRecordsRef.update(updates);
+    paySelectedKeys.clear();
+    showNotice(`🗑️ ${keys.length} पेमेंट रिकॉर्ड डिलीट हो गए!`);
+    renderPaymentDashboard();
+  } catch (err) {
+    showNotice("❌ Delete Error: " + err.message);
+  } finally {
+    setBusy(false);
+  }
+});
+
+function openPaymentPrintPreview() {
+  const filtered = getFilteredPaymentRecords();
+  if (!filtered.length) {
+    showNotice("⚠️ प्रिंट करने के लिए कोई पेमेंट रिकॉर्ड उपलब्ध नहीं है!");
+    return;
+  }
+
+  const hasSelected = paySelectedKeys.size > 0;
+  const printList = hasSelected ? filtered.filter(r => paySelectedKeys.has(r.key)) : filtered;
+
+  if (!printList.length) {
+    showNotice("⚠️ चुने हुए रिकॉर्ड्स में से कोई डेटा नहीं मिला!");
+    return;
+  }
+
+  let totalQty = 0;
+  let totalBags = 0;
+  let totalAmount = 0;
+
+  printList.forEach(r => {
+    const d = r.data;
+    totalBags += num(field(d, ["Lifted Bags", "Bore", "Bags"]));
+    totalQty += num(field(d, ["Lifted Weight", "Weight", "Qty"]));
+    totalAmount += (getPaymentAmount(d) || 0);
+  });
+
+  const curSeason = $("paySeasonFilter").value || "All Seasons";
+  const curCrop = $("payCropFilter").value || "All Crops";
+  const selectionNote = hasSelected ? ` | Selected: ${printList.length}` : "";
+
+  $("customPrintSheetTitle").textContent = "💳 Farmer Payment Status Report";
+  $("customSheetMetaText").textContent = `Season: ${curSeason} | Crop: ${curCrop}${selectionNote} | Total Entries: ${printList.length} | कुल राशि: ₹${fmt(totalAmount, 2)}`;
+
+  let tbodyHtml = "";
+  printList.forEach((r, idx) => {
+    const d = r.data;
+    const farmer = getCustomer(d).replace(/\n/g, " ");
+    const jf = d["J_Form_Number"] || getGatepass(d) || "-";
+    const mob = getMobile(d) || "-";
+    const bags = num(field(d, ["Lifted Bags", "Bore", "Bags"]));
+    const weight = num(field(d, ["Lifted Weight", "Weight", "Qty"]));
+    const pStatusRaw = getPaymentStatus(d);
+    const pType = normalizePaymentStatusType(pStatusRaw);
+    const pAmt = getPaymentAmount(d) || 0;
+    const pDate = getPaymentDate(d) || "-";
+
+    tbodyHtml += `
+      <tr>
+        <td style="text-align:center;">${idx + 1}</td>
+        <td class="col-farmer-val">${farmer}</td>
+        <td style="font-weight:700; color:#0369a1;">${jf}</td>
+        <td>${mob}</td>
+        <td style="text-align:right; color:#7e22ce; font-weight:700;">${bags ? fmt(bags, 0) : "-"}</td>
+        <td class="col-qty-val">${weight ? fmt(weight, 2) : "-"}</td>
+        <td style="text-align:right; font-weight:800; color:#1e293b;">₹${fmt(pAmt, 2)}</td>
+        <td style="text-align:center;">${pType === 'success' ? '✅ Paid' : (pType === 'progress' ? '⏳ In Progress' : '⌛ Pending')}</td>
+        <td style="text-align:center;">${pDate}</td>
+      </tr>
+    `;
+  });
+
+  const tableHtml = `
+    <table class="custom-sheet-table">
+      <thead>
+        <tr>
+          <th style="width:30px; text-align:center;">#</th>
+          <th>Farmer Name</th>
+          <th>J-Form / GP Number</th>
+          <th>Mobile</th>
+          <th style="text-align:right;">Bags</th>
+          <th style="text-align:right;">Qty (Qtl)</th>
+          <th style="text-align:right;">Amount (₹)</th>
+          <th style="text-align:center;">Payment Status</th>
+          <th style="text-align:center;">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tbodyHtml}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" style="text-align:right; font-weight:800;">कुल Total:</td>
+          <td style="text-align:right; color:#7e22ce; font-weight:800;">${fmt(totalBags, 0)}</td>
+          <td style="text-align:right; color:#15803d; font-weight:800;">${fmt(totalQty, 2)} Qtl</td>
+          <td style="text-align:right; color:#005bb5; font-weight:800;">₹${fmt(totalAmount, 2)}</td>
+          <td colspan="2"></td>
+        </tr>
+      </tfoot>
+    </table>
+  `;
+
+  $("customSheetTableWrap").innerHTML = tableHtml;
+
+  const screenWidth = window.innerWidth;
+  let autoZoom = 0.95;
+  if (screenWidth < 980) {
+    autoZoom = Math.max(0.35, Number(((screenWidth - 24) / 980).toFixed(2)));
+  }
+  
+  zoomSlider.value = autoZoom;
+  zoomValDisplay.textContent = `${Math.round(autoZoom * 100)}%`;
+  printSheet.style.transform = `scale(${autoZoom})`;
+
+  if (printCanvas) {
+    printCanvas.scrollLeft = 0;
+    printCanvas.scrollTop = 0;
+  }
+
+  $("directPrintModal").style.display = "flex";
+}
+
+$("payPrintPreviewBtn").addEventListener("click", openPaymentPrintPreview);
+$("payDirectPrintBtn").addEventListener("click", () => {
+  openPaymentPrintPreview();
+  setTimeout(() => {
+    $("customPrintNowBtn").click();
+  }, 300);
+});
+
+// Event Listeners for Payment Filters WITH LOCALSTORAGE PERSISTENCE
+$("paySearchInput").addEventListener("input", renderPaymentDashboard);
+$("payStatusFilter").addEventListener("change", renderPaymentDashboard);
+
+$("paySeasonFilter").addEventListener("change", (e) => {
+  localStorage.setItem(LAST_PAY_SEASON_KEY, e.target.value);
+  renderPaymentDashboard();
+});
+
+$("payCropFilter").addEventListener("change", (e) => {
+  localStorage.setItem(LAST_PAY_CROP_KEY, e.target.value);
+  renderPaymentDashboard();
+});
+
+$("payClearFilterBtn").addEventListener("click", () => {
+  $("paySearchInput").value = "";
+  $("payStatusFilter").value = "";
+  $("paySeasonFilter").value = "";
+  $("payCropFilter").value = "";
+  localStorage.removeItem(LAST_PAY_SEASON_KEY);
+  localStorage.removeItem(LAST_PAY_CROP_KEY);
+  renderPaymentDashboard();
+});
+
+$("payExportBtn").addEventListener("click", () => {
+  const exportList = getFilteredPaymentRecords().map(r => {
+    const d = r.data;
+    return {
+      "Farmer Name": getCustomer(d).replace(/\n/g, " "),
+      "J-Form Number": d["J_Form_Number"] || getGatepass(d) || "",
+      "Mobile": getMobile(d),
+      "Lifted Bags": field(d, ["Lifted Bags", "Bore", "Bags"]),
+      "Lifted Weight (Qtl)": field(d, ["Lifted Weight", "Weight", "Qty"]),
+      "Total Amount": getPaymentAmount(d) || 0,
+      "Payment Status": getPaymentStatus(d) || "Pending",
+      "Payment Date": getPaymentDate(d) || getDate(d),
+      "Season": getSeason(d),
+      "Crop": getCrop(d)
+    };
+  });
+
+  if (!exportList.length) { showNotice("⚠️ एक्सपोर्ट के लिए कोई डेटा नहीं है!"); return; }
+  const ws = XLSX.utils.json_to_sheet(exportList);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Payment_Report");
+  XLSX.writeFile(wb, "Farmer_Payment_Status_Report.xlsx");
+});
+
+/* ========================================================
+   EXISTING MASTER & SUMMARY HANDLERS PRESERVED AS IS
+   ======================================================== */
 $("manageMasterBtn").addEventListener("click", () => {
   isEditingMaster = false;
   $("masterModal").style.display = "flex";
@@ -2252,9 +3184,7 @@ $("exportBtn").addEventListener("click", () => {
   XLSX.writeFile(wb, "GatePass_Export.xlsx");
 });
 
-/* ========================================================
-   SCREENSHOT EXACT MATCH PRINT VIEW LOGIC WITH SLIDER
-   ======================================================== */
+/* PRINT VIEW MODAL WITH ZOOM SLIDER */
 const zoomSlider = $("customZoomRange");
 const zoomValDisplay = $("customZoomVal");
 const printSheet = $("customPrintSheet");
@@ -2273,7 +3203,6 @@ function openDirectPrintPreview() {
     return;
   }
 
-  // Filter only selected rows if any are checked, else show all visible
   const hasSelected = selectedKeys.size > 0;
   const printList = hasSelected ? filtered.filter(r => selectedKeys.has(r.key)) : filtered;
 
@@ -2295,9 +3224,9 @@ function openDirectPrintPreview() {
   const selectedVillage = $("villageFilter").value ? ` | Village: ${$("villageFilter").value}` : "";
   const selectionNote = hasSelected ? ` | Selected: ${printList.length}` : "";
   
+  $("customPrintSheetTitle").textContent = "📂 Gate Pass Records Report";
   $("customSheetMetaText").textContent = `Season: ${currentSeason} | Crop: ${currentCrop}${selectedVillage}${selectionNote} | Total Entries: ${printList.length}`;
 
-  // Build clean landscape table matching Screenshot exactly
   let tbodyHtml = "";
   printList.forEach((r, idx) => {
     const calc = getCalculatedValues(r);
@@ -2358,7 +3287,6 @@ function openDirectPrintPreview() {
 
   $("customSheetTableWrap").innerHTML = tableHtml;
 
-  // Auto calculate perfect zoom ratio according to phone screen width so no columns cut
   const screenWidth = window.innerWidth;
   let autoZoom = 0.95;
   if (screenWidth < 980) {
@@ -2369,7 +3297,6 @@ function openDirectPrintPreview() {
   zoomValDisplay.textContent = `${Math.round(autoZoom * 100)}%`;
   printSheet.style.transform = `scale(${autoZoom})`;
 
-  // Ensure scroll is at the very beginning (left: 0)
   if (printCanvas) {
     printCanvas.scrollLeft = 0;
     printCanvas.scrollTop = 0;
@@ -2401,7 +3328,7 @@ $("printBtn").addEventListener("click", () => {
 });
 
 /* ========================================================
-   SUMMARY: MULTI-SEARCH & VIEW CHECKED SUPPORT
+   SUMMARY LOGIC PRESERVED EXACTLY AS IS
    ======================================================== */
 $("summaryBtn").addEventListener("click", () => {
   openSummaryModal();
@@ -2433,7 +3360,6 @@ function openSummaryModal() {
     return;
   }
 
-  // Group records by UNIQUE Farmer Key (Name + Village + Mobile)
   const farmerMap = new Map();
   const summaryVillagesMap = new Map();
 
@@ -2486,14 +3412,12 @@ function openSummaryModal() {
 
   currentSummaryFarmers = [...farmerMap.values()].sort((a,b) => a.displayName.localeCompare(b.displayName, 'hi'));
 
-  // Default: Keep previously checked or select all
   if (!selectedSummaryFarmerKeys.size) {
     selectedSummaryFarmerKeys = new Set(currentSummaryFarmers.map(f => f.uniqueKey));
   } else {
     selectedSummaryFarmerKeys = new Set([...selectedSummaryFarmerKeys].filter(k => currentSummaryFarmers.some(f => f.uniqueKey === k)));
   }
 
-  // Populate filtered villages dropdown for Summary
   const sortedVillages = [...summaryVillagesMap.values()].sort((a,b) => a.localeCompare(b, 'hi'));
   let vHtml = '<option value="">सभी गाँव (All Villages)</option>';
   sortedVillages.forEach(v => {
@@ -2804,7 +3728,8 @@ $("refreshBtn").addEventListener("click", async () => {
   try {
     setConnection("🔄 Syncing...");
     await recordsRef.once("value");
-    setConnection("🟢 Firebase Online (" + records.length + " Rows)");
+    await paymentRecordsRef.once("value");
+    setConnection("🟢 Firebase Online (" + records.length + " GP Rows)");
   } catch (e) { setConnection("❌ Sync Error", true); }
 });
 
