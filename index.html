@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="manifest" href="/J-form/manifest.json">
-<meta name="theme-color" content="#0f172a">
 <title>Saini Trading Company - Gate Pass & Payment Management</title>
 
 <!-- External Libraries -->
@@ -170,29 +168,32 @@ th.col-date, td.col-date {
 .badge-pay-success {
   background: #dcfce7;
   color: #15803d;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 10.5px;
   border: 1px solid #86efac;
+  display: inline-block;
 }
 .badge-pay-progress {
   background: #fef3c7;
   color: #b45309;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 10.5px;
   border: 1px solid #fde68a;
+  display: inline-block;
 }
 .badge-pay-pending {
   background: #f1f5f9;
   color: #475569;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 11px;
+  font-size: 10.5px;
   border: 1px solid #cbd5e1;
+  display: inline-block;
 }
 .badge-pay-failed {
   background: #fee2e2;
@@ -200,8 +201,9 @@ th.col-date, td.col-date {
   padding: 2px 7px;
   border-radius: 4px;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 10.5px;
   border: 1px solid #fca5a5;
+  display: inline-block;
 }
 
 tfoot tr {
@@ -263,7 +265,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   font-weight: 600;
 }
 
-/* Summary Styles */
+/* Summary Styles (No dots ... wrapping enabled) */
 .summary-farmer-card {
   border: 1px solid #cbd5e1;
   border-radius: 7px;
@@ -300,31 +302,27 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
 .summary-fit-table {
   width: 100%;
-  table-layout: fixed;
   border-collapse: collapse;
 }
 .summary-fit-table th {
   background: #f8fafc;
   color: var(--muted);
   font-size: 11px;
-  padding: 5px 3px;
+  padding: 5px 4px;
   border-bottom: 1px solid #cbd5e1;
   position: static;
   text-align: left;
 }
 .summary-fit-table td {
-  padding: 5px 3px;
+  padding: 6px 4px;
   font-size: 11px;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .summary-fit-table tfoot td {
   background: #f8fafc;
   border-top: 1.5px solid #cbd5e1;
-  padding: 6px 3px;
+  padding: 6px 4px;
 }
 
 /* Perfect A4 Print View Modal Styles */
@@ -707,7 +705,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 </div>
 
 <!-- ========================================================
-     PAYMENT DASHBOARD MODAL (DEDICATED SEPARATE STORAGE)
+     PAYMENT DASHBOARD MODAL
      ======================================================== -->
 <div id="paymentModal" class="modal">
   <div class="modal-content" style="max-width: 1020px; width: 98%; height: 96vh; max-height: 96vh; display: flex; flex-direction: column; padding: 10px; overflow: hidden;">
@@ -755,7 +753,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
         <div class="stat-box" style="padding:4px;"><small style="font-size:9px;">कुल पेड राशि</small><strong id="payStatPaidAmount" style="color:var(--green); font-size:11.5px;">₹0</strong></div>
       </div>
 
-      <!-- Payment Dashboard Multi-Filters WITH MULTI-SEARCH & PERSISTENT DROPDOWNS -->
+      <!-- Payment Dashboard Multi-Filters -->
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap:5px; background:#f1f5f9; padding:6px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:6px;">
         <div>
           <label style="font-size:9px;">🔍 मल्टी-सर्च (नाम, नाम, GP)</label>
@@ -908,9 +906,9 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
   </div>
 </div>
 
-<!-- Modal: Gatepass Summary with Multi-Search & Show Checked Feature -->
+<!-- Modal: Gatepass Summary with Multi-Search & Live Payment -->
 <div id="summaryModal" class="modal">
-  <div class="modal-content" style="max-width: 800px; width: 96%; max-height: 94vh; display: flex; flex-direction: column; padding: 10px;">
+  <div class="modal-content" style="max-width: 840px; width: 96%; max-height: 94vh; display: flex; flex-direction: column; padding: 10px;">
     <div class="modal-header">
       <h3>📑 किसान अनुसार Gatepass Summary</h3>
       <span class="close-modal" id="closeSummaryModal">&times;</span>
@@ -924,7 +922,7 @@ td input[type=checkbox], th input[type=checkbox]{width:15px; height:15px; cursor
 
     <div class="summary-filter-bar no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px; background:#f1f5f9; padding:6px; border-radius:6px; border:1px solid #cbd5e1;">
       <div>
-        <label style="font-size:9.5px; margin-bottom:1px;">🔍 Multi-Search (e.g. Balbir, Mohit)</label>
+        <label style="font-size:9.5px; margin-bottom:1px;">🔍 Multi-Search (e.g. Balbir, Mohit, Devi Dass)</label>
         <input type="text" id="summarySearchInput" placeholder="एक या अधिक नाम (कोमा , लगाकर)..." style="padding:4px 6px; font-size:11.5px; background:white;">
       </div>
       <div>
@@ -1047,7 +1045,7 @@ function norm(v) {
     .replace(/[^a-z0-9\u0900-\u097f]/g, "");
 }
 
-/* SMART CORE NUMBER EXTRACTOR: Strips GP-, JF-, AUC- */
+/* SMART CORE NUMBER EXTRACTOR */
 function coreNumber(v) {
   if (!v) return "";
   let s = String(v).trim().toUpperCase();
@@ -1135,7 +1133,7 @@ function getSeason(r) { return String(field(r, ["Season Year", "Season", "Season
 function getCrop(r) { return String(field(r, ["Crop", "Crop Name", "Commodity Name", "फसल"]) ?? "").trim(); }
 function getBiometric(r) { return String(field(r, ["Biometric", "Biometric Status", "बायोमेट्रिक", "बायो"]) ?? "").trim(); }
 
-/* STRICT & EXACT AUCTION FIELD RETRIEVER (INCLUDES 'Status' COLUMN FROM GATE PASS EXCEL) */
+/* STRICT & EXACT AUCTION FIELD RETRIEVER */
 function getAuction(r) { 
   const val = field(r, [
     "Status", "Auction Status", "Auction", "Gatepass Status", "GP Status", 
@@ -1178,7 +1176,7 @@ function getPaymentAmount(r) {
 }
 
 function getPaymentDate(r) {
-  const d = field(r, ["Payment Date", "Pay Date", "Paid Date", "पेमेंट दिनांक", "भुगतान दिनांक", "Auction Date", "Date"]);
+  const d = field(r, ["Payment Date", "Pay Date", "Paid Date", "पेमेंट दिनांक", "भुगतान दिनांक", "Pay Now Date", "Auction Date", "Date"]);
   return d ? isoDate(d) : "";
 }
 
@@ -1209,6 +1207,37 @@ function renderPaymentBadge(rawStatus) {
     return `<span class="badge-pay-failed">❌ ${rawStatus || "Hold/Failed"}</span>`;
   }
   return `<span class="badge-pay-pending">⌛ Pending</span>`;
+}
+
+/* FAST IN-MEMORY PAYMENT LOOKUP TO CROSS-MATCH GATEPASS WITH PAYMENT EXCEL */
+function getPaymentMatchForGatepass(gpRaw, farmerRaw, weightRaw) {
+  const gpCore = coreNumber(gpRaw);
+  const farmerNorm = norm(farmerRaw);
+  const w = num(weightRaw);
+
+  if (!paymentRecords.length) return null;
+
+  // 1. Direct match by J-Form Core Number
+  if (gpCore) {
+    const found = paymentRecords.find(p => coreNumber(p.data["J_Form_Number"] || getGatepass(p.data)) === gpCore);
+    if (found) return found.data;
+  }
+
+  // 2. Secondary match by Farmer Name and matching weight
+  if (farmerNorm) {
+    const found = paymentRecords.find(p => {
+      const pFarmer = norm(getCustomer(p.data));
+      if (pFarmer !== farmerNorm) return false;
+      if (w > 0) {
+        const pWeight = num(field(p.data, ["Lifted Weight", "Weight", "Qty"]));
+        return Math.abs(pWeight - w) < 0.5;
+      }
+      return true;
+    });
+    if (found) return found.data;
+  }
+
+  return null;
 }
 
 function getRawQty(r) { 
@@ -1278,7 +1307,7 @@ function setBusy(v) {
   busy = v;
   $("busy").style.display = v ? "block" : "none";
   $("uploadBtn").disabled = v;
-  $("deleteBtn").disabled = v;
+  $("deleteBtn").disabled = false;
 }
 
 async function startFirebase() {
@@ -1449,6 +1478,9 @@ function listenRecords() {
     setConnection("🟢 Firebase Online (" + records.length + " GatePass Rows)");
     updateDynamicFilterOptions();
     render();
+    if ($("summaryModal").style.display === "flex") {
+      renderSummaryCards();
+    }
   }, e => setConnection("❌ Load Error: " + e.message, true));
 }
 
@@ -1462,9 +1494,14 @@ function listenPaymentRecords() {
       data: value && typeof value === "object" ? value : {}
     }));
     paySelectedKeys = new Set([...paySelectedKeys].filter(k => paymentRecords.some(r => r.key === k)));
+    
     if ($("paymentModal").style.display === "flex") {
       renderPaymentDashboard();
     }
+    if ($("summaryModal").style.display === "flex") {
+      renderSummaryCards();
+    }
+    if (initialLoadDone) render();
   });
 }
 
@@ -1533,6 +1570,7 @@ function getCropRate(cropName) {
   return found && found.rate ? Number(found.rate) : 0;
 }
 
+/* 100% FAITHFUL GATEPASS CALCULATION: PRESERVES EXACT GATE PASS EXCEL QUANTITY (40.00 / 60.00) */
 function getCalculatedValues(r) {
   const rawQ = String(getRawQty(r.data) ?? "").trim();
   const rawB = String(getRawBore(r.data) ?? "").trim();
@@ -1703,6 +1741,7 @@ function render() {
 
   const standard = [
     {title:"Customer Name", aliases:["Customer Name","Customer","Farmer Name","Name","Kisan Name","किसान नाम"]},
+    {title:"Payment Status", aliases:["Payment Status","PaymentStatus","Pay Status","Payment"]},
     {title:"Date", aliases:["Date","Gatepass Date","Gate Pass Date","दिनांक"]},
     {title:"Season Year", aliases:["Season Year","Season","SeasonYear","सीज़न"]},
     {title:"Crop", aliases:["Crop","Crop Name","Commodity Name","फसल"]},
@@ -1728,6 +1767,7 @@ function render() {
 
   const cols = rawCols.filter((c, idx) => {
     if (idx === 0) return true;
+    if (c.title === "Payment Status") return true;
     const nTitle = norm(c.title);
     const nKey = norm(c.key);
     if (hiddenCols.some(h => nTitle.includes(h) || nKey.includes(h))) return false;
@@ -1811,6 +1851,15 @@ function render() {
       if (idx === 0 || norm(c.title).includes("customer") || norm(c.title).includes("farmer") || norm(c.title) === "name") {
         value = formatName(value);
         td.style.fontWeight = "800";
+      }
+
+      // Live matched Payment Status in GatePass Table
+      if (c.title === "Payment Status") {
+        const payMatch = getPaymentMatchForGatepass(getGatepass(r.data), getCustomer(r.data), getRawQty(r.data));
+        const pStatus = payMatch ? getPaymentStatus(payMatch) : getPaymentStatus(r.data);
+        td.innerHTML = renderPaymentBadge(pStatus);
+        tr.appendChild(td);
+        return;
       }
 
       if (norm(c.title) === "date") {
@@ -2225,7 +2274,6 @@ $("paymentUploadBtn").addEventListener("click", async () => {
 
     Object.entries(oldPayments).forEach(([key, rec]) => {
       if (!rec || typeof rec !== "object") return;
-      // Clean up any old garbage "अज्ञात किसान" rows automatically
       if (!isValidCustomerRow(rec)) {
         paymentRecordsRef.child(key).remove();
         return;
@@ -2252,7 +2300,7 @@ $("paymentUploadBtn").addEventListener("click", async () => {
 
     for (let i = 0; i < paymentExcelRows.length; i++) {
       const pRow = paymentExcelRows[i];
-      if (!isValidCustomerRow(pRow)) continue; // Never insert Grand Total rows
+      if (!isValidCustomerRow(pRow)) continue;
 
       const jfRaw = getGatepass(pRow);
       const jfCore = coreNumber(jfRaw);
@@ -2311,7 +2359,7 @@ $("paymentUploadBtn").addEventListener("click", async () => {
 });
 
 /* ========================================================
-   PAYMENT DASHBOARD RENDERING & MULTI-SEARCH FILTERING
+   PAYMENT DASHBOARD RENDERING & EXACT TOTAL SYNCHRONIZATION
    ======================================================== */
 function openPaymentDashboard() {
   $("paymentModal").style.display = "flex";
@@ -2339,7 +2387,7 @@ function getFilteredPaymentRecords() {
 
   return paymentRecords.filter(r => {
     const d = r.data;
-    if (!isValidCustomerRow(d)) return false; // Hide any accidental total rows
+    if (!isValidCustomerRow(d)) return false;
 
     const name = norm(getCustomer(d));
     const jf = norm(d["J_Form_Number"] || getGatepass(d) || "");
@@ -2370,35 +2418,42 @@ function updatePaymentSelectedCountDisplay() {
 }
 
 function renderPaymentDashboard() {
-  const validPayments = paymentRecords.filter(r => isValidCustomerRow(r.data));
-  let totalRecords = validPayments.length;
+  const filteredPayList = getFilteredPaymentRecords();
+
   let successCount = 0;
   let progressCount = 0;
   let pendingCount = 0;
-  let totalPaidAmount = 0;
+  let subtotalBags = 0;
+  let subtotalQty = 0;
+  let subtotalAmount = 0;
 
-  validPayments.forEach(r => {
-    const rawSt = getPaymentStatus(r.data);
+  filteredPayList.forEach(r => {
+    const d = r.data;
+    const rawSt = getPaymentStatus(d);
     const type = normalizePaymentStatusType(rawSt);
-    const pAmt = getPaymentAmount(r.data) || 0;
+    const pAmt = getPaymentAmount(d) || 0;
+    const bags = num(field(d, ["Lifted Bags", "Bore", "Bags"]));
+    const weight = num(field(d, ["Lifted Weight", "Weight", "Qty"]));
 
     if (type === "success") {
       successCount++;
-      totalPaidAmount += pAmt;
     } else if (type === "progress") {
       progressCount++;
     } else {
       pendingCount++;
     }
+
+    subtotalBags += bags;
+    subtotalQty += weight;
+    subtotalAmount += pAmt;
   });
 
-  $("payStatTotal").textContent = totalRecords;
+  $("payStatTotal").textContent = filteredPayList.length;
   $("payStatSuccess").textContent = successCount;
   $("payStatProgress").textContent = progressCount;
   $("payStatPending").textContent = pendingCount;
-  $("payStatPaidAmount").textContent = "₹" + fmt(totalPaidAmount, 2);
+  $("payStatPaidAmount").textContent = "₹" + fmt(subtotalAmount, 2);
 
-  const filteredPayList = getFilteredPaymentRecords();
   const tbody = $("paymentTableBody");
   tbody.innerHTML = "";
 
@@ -2410,15 +2465,11 @@ function renderPaymentDashboard() {
   updatePaymentSelectedCountDisplay();
 
   if (!filteredPayList.length) {
-    tbody.innerHTML = `<tr><td colspan="10" class="empty">${validPayments.length ? "फिल्टर के अनुसार कोई पेमेंट रिकॉर्ड नहीं मिला।" : "अभी कोई पेमेंट Excel अपलोड नहीं है। कृपया ऊपर से अपलोड करें।"}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="empty">${paymentRecords.length ? "फिल्टर के अनुसार कोई पेमेंट रिकॉर्ड नहीं मिला।" : "अभी कोई पेमेंट Excel अपलोड नहीं है। कृपया ऊपर से अपलोड करें।"}</td></tr>`;
     $("paymentTableFoot").innerHTML = "";
-    $("paymentFooterInfo").textContent = `दिख रहे रिकॉर्ड्स: 0 / कुल पेमेंट: ${validPayments.length}`;
+    $("paymentFooterInfo").textContent = `दिख रहे रिकॉर्ड्स: 0 / कुल पेमेंट: ${paymentRecords.length}`;
     return;
   }
-
-  let subtotalBags = 0;
-  let subtotalQty = 0;
-  let subtotalAmount = 0;
 
   filteredPayList.forEach((r, idx) => {
     const d = r.data;
@@ -2430,10 +2481,6 @@ function renderPaymentDashboard() {
     const pStatusRaw = getPaymentStatus(d);
     const pAmt = getPaymentAmount(d) || 0;
     const pDate = getPaymentDate(d) || "-";
-
-    subtotalBags += bags;
-    subtotalQty += weight;
-    subtotalAmount += pAmt;
 
     const tr = document.createElement("tr");
     const isChecked = paySelectedKeys.has(r.key);
@@ -2472,7 +2519,7 @@ function renderPaymentDashboard() {
     </tr>
   `;
 
-  $("paymentFooterInfo").textContent = `दिख रहे रिकॉर्ड्स: ${filteredPayList.length} / कुल पेमेंट: ${validPayments.length}`;
+  $("paymentFooterInfo").textContent = `दिख रहे रिकॉर्ड्स: ${filteredPayList.length} / कुल पेमेंट: ${paymentRecords.length}`;
 }
 
 $("payMasterCheckbox").addEventListener("change", (e) => {
@@ -2497,7 +2544,6 @@ $("payUnselectAllBtn").addEventListener("click", () => {
 
 // Delete ONLY deletes from Payment Database (GatePass Database is untouched)
 $("payDeleteSelectedBtn").addEventListener("click", () => {
-  if (busy) return;
   if (!paySelectedKeys.size) {
     showNotice("⚠️ कृपया कम से कम एक पेमेंट रिकॉर्ड चुनें!");
     return;
@@ -2514,7 +2560,6 @@ $("payConfirmDeleteBtn").addEventListener("click", async () => {
   $("payDeleteModal").style.display = "none";
   if (!paySelectedKeys.size) return;
 
-  setBusy(true);
   const keys = [...paySelectedKeys];
   try {
     const updates = {};
@@ -2525,8 +2570,6 @@ $("payConfirmDeleteBtn").addEventListener("click", async () => {
     renderPaymentDashboard();
   } catch (err) {
     showNotice("❌ Delete Error: " + err.message);
-  } finally {
-    setBusy(false);
   }
 });
 
@@ -2698,7 +2741,662 @@ $("payExportBtn").addEventListener("click", () => {
 });
 
 /* ========================================================
-   EXISTING MASTER & SUMMARY HANDLERS PRESERVED AS IS
+   SUMMARY: MULTI-SEARCH & VIEW CHECKED (BORE FROM PAYMENT DASHBOARD)
+   ======================================================== */
+$("summaryBtn").addEventListener("click", () => {
+  openSummaryModal();
+});
+
+$("closeSummaryModal").addEventListener("click", () => {
+  $("summaryModal").style.display = "none";
+});
+
+$("summaryCloseBtn").addEventListener("click", () => {
+  $("summaryModal").style.display = "none";
+});
+
+function openSummaryModal() {
+  const list = getFiltered();
+  $("summarySearchInput").value = "";
+  showCheckedOnly = false;
+  updateToggleCheckedBtnState();
+
+  if (!list.length) {
+    $("summaryContainer").innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">चयनित फिल्टर के लिए कोई डेटा नहीं है!</div>';
+    $("summaryFarmerCount").textContent = "0";
+    $("summaryTotalGP").textContent = "0";
+    $("summaryTotalBore").textContent = "0";
+    $("summaryTotalQty").textContent = "0.00";
+    $("summaryGrandAmount").textContent = "₹0";
+    $("summaryVillageFilter").innerHTML = '<option value="">सभी गाँव (All Villages)</option>';
+    $("summaryModal").style.display = "flex";
+    return;
+  }
+
+  const farmerMap = new Map();
+  const summaryVillagesMap = new Map();
+
+  list.forEach(r => {
+    const rawName = getCustomer(r.data).replace(/\n/g, " ").trim() || "अज्ञात किसान";
+    const v = getVillage(r.data);
+    const m = getMobile(r.data);
+
+    if (v && v.trim()) {
+      const vClean = v.trim();
+      if (!summaryVillagesMap.has(norm(vClean))) {
+        summaryVillagesMap.set(norm(vClean), vClean);
+      }
+    }
+
+    const uniqueKey = norm(rawName) + "|" + norm(v) + "|" + norm(m);
+
+    if (!farmerMap.has(uniqueKey)) {
+      farmerMap.set(uniqueKey, {
+        uniqueKey: uniqueKey,
+        displayName: rawName,
+        village: v,
+        mobile: m,
+        items: [],
+        totalQty: 0,
+        totalBore: 0,
+        totalAmount: 0
+      });
+    }
+
+    const farmerObj = farmerMap.get(uniqueKey);
+    const calc = getCalculatedValues(r);
+
+    // BORE UTHTAYE PAYMENT DASHBOARD SE!
+    const payMatch = getPaymentMatchForGatepass(getGatepass(r.data), farmerObj.displayName, calc.qty);
+    let finalBore = calc.bore;
+    if (payMatch) {
+      const pBags = num(field(payMatch, ["Lifted Bags", "Bore", "Bags"]));
+      if (pBags > 0) finalBore = pBags;
+    }
+
+    farmerObj.totalQty += calc.qty;
+    farmerObj.totalBore += finalBore;
+    farmerObj.totalAmount += calc.amount;
+
+    farmerObj.items.push({
+      record: r,
+      gp: getGatepass(r.data) || "-",
+      date: shortDate(getDate(r.data)).replace(/\n/g, " "),
+      crop: getCrop(r.data) || "-",
+      village: v || farmerObj.village || "",
+      qty: calc.qty,
+      bore: finalBore, // Verified Bags from Payment Dashboard
+      rate: calc.rate,
+      amount: calc.amount,
+      payMatch: payMatch
+    });
+  });
+
+  currentSummaryFarmers = [...farmerMap.values()].sort((a,b) => a.displayName.localeCompare(b.displayName, 'hi'));
+
+  if (!selectedSummaryFarmerKeys.size) {
+    selectedSummaryFarmerKeys = new Set(currentSummaryFarmers.map(f => f.uniqueKey));
+  } else {
+    selectedSummaryFarmerKeys = new Set([...selectedSummaryFarmerKeys].filter(k => currentSummaryFarmers.some(f => f.uniqueKey === k)));
+  }
+
+  const sortedVillages = [...summaryVillagesMap.values()].sort((a,b) => a.localeCompare(b, 'hi'));
+  let vHtml = '<option value="">सभी गाँव (All Villages)</option>';
+  sortedVillages.forEach(v => {
+    vHtml += `<option value="${v}">${v}</option>`;
+  });
+  $("summaryVillageFilter").innerHTML = vHtml;
+
+  renderSummaryCards();
+  $("summaryModal").style.display = "flex";
+}
+
+function updateToggleCheckedBtnState() {
+  const btn = $("summaryToggleCheckedBtn");
+  if (showCheckedOnly) {
+    btn.textContent = `📋 Show All (${currentSummaryFarmers.length})`;
+    btn.className = "orange";
+  } else {
+    btn.textContent = `👁️ Show Checked (${selectedSummaryFarmerKeys.size})`;
+    btn.className = "purple";
+  }
+}
+
+function renderSummaryCards() {
+  const container = $("summaryContainer");
+  container.innerHTML = "";
+
+  const searchRaw = $("summarySearchInput").value.trim();
+  const searchQueries = searchRaw ? searchRaw.split(",").map(s => norm(s)).filter(Boolean) : [];
+  const selectedVillage = $("summaryVillageFilter").value;
+
+  let filteredFarmers = currentSummaryFarmers.filter(f => {
+    if (showCheckedOnly && !selectedSummaryFarmerKeys.has(f.uniqueKey)) {
+      return false;
+    }
+
+    if (selectedVillage) {
+      const fVillage = f.village || "";
+      const hasMatchingItemVillage = f.items.some(it => norm(it.village) === norm(selectedVillage));
+      if (norm(fVillage) !== norm(selectedVillage) && !hasMatchingItemVillage) {
+        return false;
+      }
+    }
+
+    if (searchQueries.length > 0) {
+      const isMatched = searchQueries.some(q => {
+        const nameMatch = norm(f.displayName).includes(q);
+        const villageMatch = norm(f.village || "").includes(q);
+        const mobileMatch = norm(f.mobile || "").includes(q);
+        const gpMatch = f.items.some(it => norm(it.gp).includes(q));
+        return nameMatch || villageMatch || mobileMatch || gpMatch;
+      });
+      if (!isMatched) return false;
+    }
+
+    return true;
+  });
+
+  let checkedFarmerCount = 0;
+  let totalGP = 0;
+  let totalBore = 0;
+  let totalQty = 0;
+  let grandTotalAmount = 0;
+
+  filteredFarmers.forEach(f => {
+    if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
+      checkedFarmerCount++;
+      totalGP += f.items.length;
+      totalBore += f.totalBore;
+      totalQty += f.totalQty;
+      grandTotalAmount += f.totalAmount;
+    }
+  });
+
+  $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
+  $("summaryTotalGP").textContent = totalGP;
+  $("summaryTotalBore").textContent = fmt(totalBore, 0);
+  $("summaryTotalQty").textContent = fmt(totalQty, 2);
+  $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
+  updateToggleCheckedBtnState();
+
+  const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
+  const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
+  const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
+  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल बोरे: ${fmt(totalBore, 0)} | कुल क्विंटल: ${fmt(totalQty, 2)} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
+
+  if (!filteredFarmers.length) {
+    container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">सर्च / फिल्टर के लिए कोई रिकॉर्ड नहीं मिला!</div>';
+    return;
+  }
+
+  filteredFarmers.forEach((farmer, idx) => {
+    const isChecked = selectedSummaryFarmerKeys.has(farmer.uniqueKey);
+    const card = document.createElement("div");
+    card.className = "summary-farmer-card" + (isChecked ? "" : " unselected");
+
+    let rowsHtml = "";
+    farmer.items.forEach((item, itemIdx) => {
+      const cleanGP = item.gp.length > 17 ? item.gp.replace("GP-49-", "") : item.gp;
+
+      // Real-time matched Payment Status badge
+      const payMatch = item.payMatch || getPaymentMatchForGatepass(item.gp, farmer.displayName, item.qty);
+      let payStatusBadgeHtml = "";
+      if (payMatch) {
+        const pSt = getPaymentStatus(payMatch);
+        const pDate = getPaymentDate(payMatch);
+        const pAmt = num(field(payMatch, ["Total Amount", "Payment Amount", "Amount"]));
+        const dateStr = pDate ? ` | 📅 ${pDate}` : "";
+        const amtStr = pAmt > 0 ? ` | ₹${fmt(pAmt, 0)}` : "";
+        if (normalizePaymentStatusType(pSt) === "success") {
+          payStatusBadgeHtml = `<div style="margin-top:2px;"><span class="badge-pay-success">✅ Paid${amtStr}${dateStr}</span></div>`;
+        } else if (normalizePaymentStatusType(pSt) === "progress") {
+          payStatusBadgeHtml = `<div style="margin-top:2px;"><span class="badge-pay-progress">⏳ In Progress${amtStr}</span></div>`;
+        } else {
+          payStatusBadgeHtml = `<div style="margin-top:2px;"><span class="badge-pay-pending">⌛ Pending</span></div>`;
+        }
+      }
+
+      rowsHtml += `
+        <tr>
+          <td style="text-align:center;">${itemIdx + 1}</td>
+          <td style="white-space:normal; overflow:visible;">
+            <span style="font-weight:700; color:var(--brand);">${cleanGP}</span>
+            ${payStatusBadgeHtml}
+          </td>
+          <td style="text-align:center; font-size:10.5px; white-space:nowrap;">${item.date}</td>
+          <td style="text-align:right; color:var(--purple); font-weight:700;">${item.bore ? fmt(item.bore, 0) : "-"}</td>
+          <td style="text-align:right; color:var(--green); font-weight:800;">${item.qty ? fmt(item.qty, 2) : "-"}</td>
+        </tr>
+      `;
+    });
+
+    card.innerHTML = `
+      <div class="summary-farmer-header">
+        <div style="flex:1; min-width:0; padding-right:6px; display:flex; align-items:flex-start; gap:8px;">
+          <input type="checkbox" class="summary-cb no-print" data-key="${farmer.uniqueKey}" ${isChecked ? "checked" : ""} style="width:16px; height:16px; margin-top:2px; cursor:pointer;">
+          <div>
+            <div class="farmer-title">${idx + 1}. 👤 ${farmer.displayName}</div>
+            <div class="farmer-sub">
+              ${farmer.village ? `🏡 ${farmer.village}` : ""}
+              ${farmer.mobile ? ` 📞 ${farmer.mobile}` : ""}
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right; white-space:nowrap;">
+          <div><span style="font-size:10.5px; color:var(--muted);">कुल GP:</span> <strong style="color:var(--brand); font-size:13px;">${farmer.items.length}</strong></div>
+          <div style="font-size:12px; color:var(--green); font-weight:800;">₹${fmt(farmer.totalAmount, 2)}</div>
+        </div>
+      </div>
+
+      <table class="summary-fit-table">
+        <thead>
+          <tr>
+            <th style="width:7%; text-align:center;">#</th>
+            <th style="width:50%;">Gatepass No. / पेमेंट स्थिति</th>
+            <th style="width:16%; text-align:center;">दिनांक</th>
+            <th style="width:12%; text-align:right;">बोरे</th>
+            <th style="width:15%; text-align:right;">क्विंटल</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align:right; font-weight:700; font-size:11px; color:var(--primary);">
+              कुल: ${fmt(farmer.totalBore, 0)} बोरे | ${fmt(farmer.totalQty, 2)} Qtl:
+            </td>
+            <td colspan="2" style="text-align:right; color:var(--green); font-weight:800; font-size:12px;">
+              ₹${fmt(farmer.totalAmount, 2)}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    const cb = card.querySelector(".summary-cb");
+    cb.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        selectedSummaryFarmerKeys.add(farmer.uniqueKey);
+        card.classList.remove("unselected");
+      } else {
+        selectedSummaryFarmerKeys.delete(farmer.uniqueKey);
+        card.classList.add("unselected");
+      }
+      updateSummaryTotalsOnly(filteredFarmers);
+      updateToggleCheckedBtnState();
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function updateSummaryTotalsOnly(filteredFarmers) {
+  let checkedFarmerCount = 0;
+  let totalGP = 0;
+  let totalBore = 0;
+  let totalQty = 0;
+  let grandTotalAmount = 0;
+
+  filteredFarmers.forEach(f => {
+    if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
+      checkedFarmerCount++;
+      totalGP += f.items.length;
+      totalBore += f.totalBore;
+      totalQty += f.totalQty;
+      grandTotalAmount += f.totalAmount;
+    }
+  });
+
+  $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
+  $("summaryTotalGP").textContent = totalGP;
+  $("summaryTotalBore").textContent = fmt(totalBore, 0);
+  $("summaryTotalQty").textContent = fmt(totalQty, 2);
+  $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
+
+  const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
+  const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
+  const selectedVillage = $("summaryVillageFilter").value;
+  const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
+  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल बोरे: ${fmt(totalBore, 0)} | कुल क्विंटल: ${fmt(totalQty, 2)} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
+}
+
+$("summaryToggleCheckedBtn").addEventListener("click", () => {
+  if (!showCheckedOnly && selectedSummaryFarmerKeys.size === 0) {
+    showNotice("⚠️ पहले किसी किसान को टिक (Check) करें!");
+    return;
+  }
+  showCheckedOnly = !showCheckedOnly;
+  if (showCheckedOnly) {
+    $("summarySearchInput").value = "";
+  }
+  renderSummaryCards();
+});
+
+$("summarySelectAllBtn").addEventListener("click", () => {
+  currentSummaryFarmers.forEach(f => selectedSummaryFarmerKeys.add(f.uniqueKey));
+  renderSummaryCards();
+});
+
+$("summaryClearBtn").addEventListener("click", () => {
+  selectedSummaryFarmerKeys.clear();
+  renderSummaryCards();
+});
+
+$("summarySearchInput").addEventListener("input", () => {
+  showCheckedOnly = false;
+  renderSummaryCards();
+});
+$("summaryVillageFilter").addEventListener("change", renderSummaryCards);
+
+$("summaryPrintBtn").addEventListener("click", () => {
+  if (selectedSummaryFarmerKeys.size === 0) {
+    showNotice("⚠️ कृपया कम से कम एक किसान को टिक (Check) करें!");
+    return;
+  }
+  document.body.classList.add("printing-summary");
+  window.print();
+  setTimeout(() => {
+    document.body.classList.remove("printing-summary");
+  }, 1000);
+});
+
+/* Sync & Retain Dropdowns */
+$("uploadSeasonSelect").addEventListener("change", (e) => {
+  const val = e.target.value;
+  localStorage.setItem(LAST_SELECTED_SEASON_KEY, val);
+  $("seasonFilter").value = val;
+  if (excelRows.length) {
+    const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+    setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+  }
+  render();
+});
+
+$("uploadCropSelect").addEventListener("change", (e) => {
+  const val = e.target.value;
+  localStorage.setItem(LAST_SELECTED_CROP_KEY, val);
+  $("cropFilter").value = val;
+  if (excelRows.length) {
+    const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+    setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+  }
+  render();
+});
+
+$("seasonFilter").addEventListener("change", (e) => {
+  if (e.target.value && e.target.value !== "__UNASSIGNED__") {
+    $("uploadSeasonSelect").value = e.target.value;
+    localStorage.setItem(LAST_SELECTED_SEASON_KEY, e.target.value);
+    if (excelRows.length) {
+      const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+      setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+    }
+  }
+  render();
+});
+
+$("cropFilter").addEventListener("change", (e) => {
+  if (e.target.value && e.target.value !== "__UNASSIGNED__") {
+    $("uploadCropSelect").value = e.target.value;
+    localStorage.setItem(LAST_SELECTED_CROP_KEY, e.target.value);
+    if (excelRows.length) {
+      const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
+      setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
+    }
+  }
+  render();
+});
+
+["search","biometricFilter","auctionFilter","villageFilter","fromDate","toDate","sortOrder"].forEach(id => {
+  const el = $(id);
+  if (el) el.addEventListener(id === "search" ? "input" : "change", render);
+});
+
+$("clearFilters").addEventListener("click", () => {
+  $("search").value = ""; 
+  $("seasonFilter").value = "";
+  $("cropFilter").value = "";
+  $("biometricFilter").value = "";
+  $("auctionFilter").value = "";
+  $("villageFilter").value = "";
+  $("fromDate").value = "";
+  $("toDate").value = "";
+  $("sortOrder").value = "uploadNewest";
+  render();
+});
+
+$("refreshBtn").addEventListener("click", async () => {
+  try {
+    setConnection("🔄 Syncing...");
+    await recordsRef.once("value");
+    await paymentRecordsRef.once("value");
+    setConnection("🟢 Firebase Online (" + records.length + " GP Rows)");
+  } catch (e) { setConnection("❌ Sync Error", true); }
+});
+
+/* ========================================================
+   GATE PASS DELETE BUTTON: ROBUST & RELIABLE LOGIC
+   ======================================================== */
+$("selectAllBtn").addEventListener("click", () => { 
+  getFiltered().forEach(r => selectedKeys.add(r.key)); 
+  render(); 
+});
+
+$("unselectBtn").addEventListener("click", () => { 
+  selectedKeys.clear(); 
+  render(); 
+});
+
+$("deleteBtn").addEventListener("click", () => {
+  if (!selectedKeys.size) {
+    showNotice("⚠️ कृपया कम से कम एक Gatepass रिकॉर्ड चुनें!");
+    return;
+  }
+  $("deleteConfirmText").textContent = `क्या आप चुने हुए ${selectedKeys.size} Gatepass रिकॉर्ड डिलीट करना चाहते हैं?`;
+  $("deleteModal").style.display = "flex";
+});
+
+$("cancelDeleteBtn").addEventListener("click", () => {
+  $("deleteModal").style.display = "none";
+});
+
+$("confirmDeleteBtn").addEventListener("click", async () => {
+  $("deleteModal").style.display = "none";
+  if (!selectedKeys.size) return;
+
+  const keys = [...selectedKeys];
+  setBusy(true);
+  try {
+    const updates = {};
+    keys.forEach(k => {
+      updates[k] = null;
+    });
+
+    await recordsRef.update(updates);
+    selectedKeys.clear();
+    setUpload("🗑️ Deleted " + keys.length + " entries");
+    showNotice(`🗑️ ${keys.length} Gatepass रिकॉर्ड सफलतापूर्वक डिलीट हो गए!`);
+    render();
+  } catch (e) {
+    console.warn("Batch delete fallback...", e);
+    try {
+      for (const k of keys) {
+        await recordsRef.child(k).remove();
+      }
+      selectedKeys.clear();
+      showNotice(`🗑️ ${keys.length} Gatepass रिकॉर्ड डिलीट हो गए!`);
+      render();
+    } catch (err2) {
+      showNotice("❌ Delete Error: " + err2.message);
+    }
+  } finally {
+    setBusy(false);
+  }
+});
+
+/* Export & Print */
+$("exportBtn").addEventListener("click", () => {
+  const list = getFiltered();
+  if (!list.length) { showNotice("कोई डेटा नहीं है!"); return; }
+  const cleanExport = list.map(r => {
+    const copy = { ...r.data };
+    delete copy._uploadedAt;
+    delete copy._updatedAt;
+    return copy;
+  });
+  const ws = XLSX.utils.json_to_sheet(cleanExport);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "GatePass");
+  XLSX.writeFile(wb, "GatePass_Export.xlsx");
+});
+
+/* PRINT VIEW MODAL WITH ZOOM SLIDER */
+const zoomSlider = $("customZoomRange");
+const zoomValDisplay = $("customZoomVal");
+const printSheet = $("customPrintSheet");
+const printCanvas = $("customPrintCanvas");
+
+zoomSlider.addEventListener("input", (e) => {
+  const val = Number(e.target.value);
+  zoomValDisplay.textContent = `${Math.round(val * 100)}%`;
+  printSheet.style.transform = `scale(${val})`;
+});
+
+function openDirectPrintPreview() {
+  const filtered = getFiltered();
+  if (!filtered.length) {
+    showNotice("⚠️ प्रिंट करने के लिए कोई रिकॉर्ड उपलब्ध नहीं है!");
+    return;
+  }
+
+  const hasSelected = selectedKeys.size > 0;
+  const printList = hasSelected ? filtered.filter(r => selectedKeys.has(r.key)) : filtered;
+
+  if (!printList.length) {
+    showNotice("⚠️ चुने हुए रिकॉर्ड्स में से कोई डेटा नहीं मिला!");
+    return;
+  }
+
+  let totalQty = 0;
+  let totalBore = 0;
+  printList.forEach(r => {
+    const calc = getCalculatedValues(r);
+    totalQty += calc.qty;
+    totalBore += calc.bore;
+  });
+
+  const currentSeason = $("seasonFilter").value || "All";
+  const currentCrop = $("cropFilter").value || "All Crops";
+  const selectedVillage = $("villageFilter").value ? ` | Village: ${$("villageFilter").value}` : "";
+  const selectionNote = hasSelected ? ` | Selected: ${printList.length}` : "";
+  
+  $("customPrintSheetTitle").textContent = "📂 Gate Pass Records Report";
+  $("customSheetMetaText").textContent = `Season: ${currentSeason} | Crop: ${currentCrop}${selectedVillage}${selectionNote} | Total Entries: ${printList.length}`;
+
+  let tbodyHtml = "";
+  printList.forEach((r, idx) => {
+    const calc = getCalculatedValues(r);
+    const farmer = getCustomer(r.data).replace(/\n/g, " ");
+    const d = getDate(r.data);
+    const gp = getGatepass(r.data) || "-";
+    const mob = getMobile(r.data) || "-";
+    const v = getVillage(r.data) || "-";
+    const bio = norm(getBiometric(r.data));
+    const isBio = (bio === "yes" || bio === "y" || bio === "true" || bio === "हाँ" || bio === "1");
+    const isAuc = isAuctionComplete(getAuction(r.data));
+
+    tbodyHtml += `
+      <tr>
+        <td style="text-align:center;">${idx + 1}</td>
+        <td class="col-farmer-val">${farmer}</td>
+        <td class="col-date-val">${d || "-"}</td>
+        <td style="font-weight:700;">${gp}</td>
+        <td>${mob}</td>
+        <td>${v}</td>
+        <td class="col-qty-val">${calc.qty ? fmt(calc.qty, 2) : "-"}</td>
+        <td class="col-bore-val">${calc.bore ? fmt(calc.bore, 0) : "-"}</td>
+        <td class="${isBio ? 'col-yes-val' : 'col-pending-val'}">${isBio ? 'Yes' : 'No'}</td>
+        <td class="${isAuc ? 'col-yes-val' : 'col-pending-val'}">${isAuc ? 'Yes' : 'Pending'}</td>
+      </tr>
+    `;
+  });
+
+  const tableHtml = `
+    <table class="custom-sheet-table">
+      <thead>
+        <tr>
+          <th style="width:30px; text-align:center;">#</th>
+          <th>Farmer Name</th>
+          <th>Date</th>
+          <th>Gatepass No</th>
+          <th>Mobile</th>
+          <th>Village</th>
+          <th style="text-align:right;">Qty (Qtl)</th>
+          <th style="text-align:right;">Bore</th>
+          <th style="text-align:center;">Biometric</th>
+          <th style="text-align:center;">Auction</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tbodyHtml}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6" style="text-align:right; font-weight:800;">कुल Total:</td>
+          <td style="text-align:right; color:#15803d; font-weight:800;">${fmt(totalQty, 2)} Qtl</td>
+          <td style="text-align:right; color:#7e22ce; font-weight:800;">${fmt(totalBore, 0)}</td>
+          <td colspan="2"></td>
+        </tr>
+      </tfoot>
+    </table>
+  `;
+
+  $("customSheetTableWrap").innerHTML = tableHtml;
+
+  const screenWidth = window.innerWidth;
+  let autoZoom = 0.95;
+  if (screenWidth < 980) {
+    autoZoom = Math.max(0.35, Number(((screenWidth - 24) / 980).toFixed(2)));
+  }
+  
+  zoomSlider.value = autoZoom;
+  zoomValDisplay.textContent = `${Math.round(autoZoom * 100)}%`;
+  printSheet.style.transform = `scale(${autoZoom})`;
+
+  if (printCanvas) {
+    printCanvas.scrollLeft = 0;
+    printCanvas.scrollTop = 0;
+  }
+
+  $("directPrintModal").style.display = "flex";
+}
+
+$("directPrintViewBtn").addEventListener("click", openDirectPrintPreview);
+$("directPrintBtnTop").addEventListener("click", openDirectPrintPreview);
+
+$("customPrintCancelBtn").addEventListener("click", () => {
+  $("directPrintModal").style.display = "none";
+});
+
+$("customPrintNowBtn").addEventListener("click", () => {
+  document.body.classList.add("printing-preview-modal");
+  document.body.classList.remove("printing-summary");
+  window.print();
+  setTimeout(() => {
+    document.body.classList.remove("printing-preview-modal");
+  }, 1000);
+});
+
+$("printBtn").addEventListener("click", () => {
+  document.body.classList.remove("printing-summary");
+  document.body.classList.remove("printing-preview-modal");
+  window.print();
+});
+
+/* ========================================================
+   MASTER DATA MANAGEMENT HANDLERS (SEASON & CROP)
    ======================================================== */
 $("manageMasterBtn").addEventListener("click", () => {
   isEditingMaster = false;
@@ -3126,625 +3824,7 @@ $("newCropInput").addEventListener("keydown", e => {
   if (e.key === "Enter") $("addCropBtn").click();
 });
 
-$("selectAllBtn").addEventListener("click", () => { 
-  getFiltered().forEach(r => selectedKeys.add(r.key)); 
-  render(); 
-});
-
-$("unselectBtn").addEventListener("click", () => { 
-  selectedKeys.clear(); 
-  render(); 
-});
-
-$("deleteBtn").addEventListener("click", () => {
-  if (busy) return;
-  if (!selectedKeys.size) {
-    showNotice("⚠️ कृपया कम से कम एक एंट्री चुनें!");
-    return;
-  }
-  $("deleteConfirmText").textContent = `क्या आप चुने हुए ${selectedKeys.size} रिकॉर्ड डिलीट करना चाहते हैं?`;
-  $("deleteModal").style.display = "flex";
-});
-
-$("cancelDeleteBtn").addEventListener("click", () => {
-  $("deleteModal").style.display = "none";
-});
-
-$("confirmDeleteBtn").addEventListener("click", async () => {
-  $("deleteModal").style.display = "none";
-  if (!selectedKeys.size) return;
-
-  setBusy(true);
-  const keys = [...selectedKeys];
-  try {
-    const updates = {};
-    keys.forEach(k => updates[k] = null);
-    await recordsRef.update(updates);
-    selectedKeys.clear();
-    setUpload("🗑️ Deleted " + keys.length + " entries");
-    showNotice(`🗑️ ${keys.length} entries successfully deleted!`);
-  } catch (e) {
-    showNotice("❌ Delete Error: " + e.message);
-  } finally {
-    setBusy(false);
-  }
-});
-
-/* Export & Print */
-$("exportBtn").addEventListener("click", () => {
-  const list = getFiltered();
-  if (!list.length) { showNotice("कोई डेटा नहीं है!"); return; }
-  const cleanExport = list.map(r => {
-    const copy = { ...r.data };
-    delete copy._uploadedAt;
-    delete copy._updatedAt;
-    return copy;
-  });
-  const ws = XLSX.utils.json_to_sheet(cleanExport);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "GatePass");
-  XLSX.writeFile(wb, "GatePass_Export.xlsx");
-});
-
-/* PRINT VIEW MODAL WITH ZOOM SLIDER */
-const zoomSlider = $("customZoomRange");
-const zoomValDisplay = $("customZoomVal");
-const printSheet = $("customPrintSheet");
-const printCanvas = $("customPrintCanvas");
-
-zoomSlider.addEventListener("input", (e) => {
-  const val = Number(e.target.value);
-  zoomValDisplay.textContent = `${Math.round(val * 100)}%`;
-  printSheet.style.transform = `scale(${val})`;
-});
-
-function openDirectPrintPreview() {
-  const filtered = getFiltered();
-  if (!filtered.length) {
-    showNotice("⚠️ प्रिंट करने के लिए कोई रिकॉर्ड उपलब्ध नहीं है!");
-    return;
-  }
-
-  const hasSelected = selectedKeys.size > 0;
-  const printList = hasSelected ? filtered.filter(r => selectedKeys.has(r.key)) : filtered;
-
-  if (!printList.length) {
-    showNotice("⚠️ चुने हुए रिकॉर्ड्स में से कोई डेटा नहीं मिला!");
-    return;
-  }
-
-  let totalQty = 0;
-  let totalBore = 0;
-  printList.forEach(r => {
-    const calc = getCalculatedValues(r);
-    totalQty += calc.qty;
-    totalBore += calc.bore;
-  });
-
-  const currentSeason = $("seasonFilter").value || "All";
-  const currentCrop = $("cropFilter").value || "All Crops";
-  const selectedVillage = $("villageFilter").value ? ` | Village: ${$("villageFilter").value}` : "";
-  const selectionNote = hasSelected ? ` | Selected: ${printList.length}` : "";
-  
-  $("customPrintSheetTitle").textContent = "📂 Gate Pass Records Report";
-  $("customSheetMetaText").textContent = `Season: ${currentSeason} | Crop: ${currentCrop}${selectedVillage}${selectionNote} | Total Entries: ${printList.length}`;
-
-  let tbodyHtml = "";
-  printList.forEach((r, idx) => {
-    const calc = getCalculatedValues(r);
-    const farmer = getCustomer(r.data).replace(/\n/g, " ");
-    const d = getDate(r.data);
-    const gp = getGatepass(r.data) || "-";
-    const mob = getMobile(r.data) || "-";
-    const v = getVillage(r.data) || "-";
-    const bio = norm(getBiometric(r.data));
-    const isBio = (bio === "yes" || bio === "y" || bio === "true" || bio === "हाँ" || bio === "1");
-    const isAuc = isAuctionComplete(getAuction(r.data));
-
-    tbodyHtml += `
-      <tr>
-        <td style="text-align:center;">${idx + 1}</td>
-        <td class="col-farmer-val">${farmer}</td>
-        <td class="col-date-val">${d || "-"}</td>
-        <td style="font-weight:700;">${gp}</td>
-        <td>${mob}</td>
-        <td>${v}</td>
-        <td class="col-qty-val">${calc.qty ? fmt(calc.qty, 2) : "-"}</td>
-        <td class="col-bore-val">${calc.bore ? fmt(calc.bore, 0) : "-"}</td>
-        <td class="${isBio ? 'col-yes-val' : 'col-pending-val'}">${isBio ? 'Yes' : 'No'}</td>
-        <td class="${isAuc ? 'col-yes-val' : 'col-pending-val'}">${isAuc ? 'Yes' : 'Pending'}</td>
-      </tr>
-    `;
-  });
-
-  const tableHtml = `
-    <table class="custom-sheet-table">
-      <thead>
-        <tr>
-          <th style="width:30px; text-align:center;">#</th>
-          <th>Farmer Name</th>
-          <th>Date</th>
-          <th>Gatepass No</th>
-          <th>Mobile</th>
-          <th>Village</th>
-          <th style="text-align:right;">Qty (Qtl)</th>
-          <th style="text-align:right;">Bore</th>
-          <th style="text-align:center;">Biometric</th>
-          <th style="text-align:center;">Auction</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${tbodyHtml}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="6" style="text-align:right; font-weight:800;">कुल Total:</td>
-          <td style="text-align:right; color:#15803d; font-weight:800;">${fmt(totalQty, 2)} Qtl</td>
-          <td style="text-align:right; color:#7e22ce; font-weight:800;">${fmt(totalBore, 0)}</td>
-          <td colspan="2"></td>
-        </tr>
-      </tfoot>
-    </table>
-  `;
-
-  $("customSheetTableWrap").innerHTML = tableHtml;
-
-  const screenWidth = window.innerWidth;
-  let autoZoom = 0.95;
-  if (screenWidth < 980) {
-    autoZoom = Math.max(0.35, Number(((screenWidth - 24) / 980).toFixed(2)));
-  }
-  
-  zoomSlider.value = autoZoom;
-  zoomValDisplay.textContent = `${Math.round(autoZoom * 100)}%`;
-  printSheet.style.transform = `scale(${autoZoom})`;
-
-  if (printCanvas) {
-    printCanvas.scrollLeft = 0;
-    printCanvas.scrollTop = 0;
-  }
-
-  $("directPrintModal").style.display = "flex";
-}
-
-$("directPrintViewBtn").addEventListener("click", openDirectPrintPreview);
-$("directPrintBtnTop").addEventListener("click", openDirectPrintPreview);
-
-$("customPrintCancelBtn").addEventListener("click", () => {
-  $("directPrintModal").style.display = "none";
-});
-
-$("customPrintNowBtn").addEventListener("click", () => {
-  document.body.classList.add("printing-preview-modal");
-  document.body.classList.remove("printing-summary");
-  window.print();
-  setTimeout(() => {
-    document.body.classList.remove("printing-preview-modal");
-  }, 1000);
-});
-
-$("printBtn").addEventListener("click", () => {
-  document.body.classList.remove("printing-summary");
-  document.body.classList.remove("printing-preview-modal");
-  window.print();
-});
-
-/* ========================================================
-   SUMMARY LOGIC PRESERVED EXACTLY AS IS
-   ======================================================== */
-$("summaryBtn").addEventListener("click", () => {
-  openSummaryModal();
-});
-
-$("closeSummaryModal").addEventListener("click", () => {
-  $("summaryModal").style.display = "none";
-});
-
-$("summaryCloseBtn").addEventListener("click", () => {
-  $("summaryModal").style.display = "none";
-});
-
-function openSummaryModal() {
-  const list = getFiltered();
-  $("summarySearchInput").value = "";
-  showCheckedOnly = false;
-  updateToggleCheckedBtnState();
-
-  if (!list.length) {
-    $("summaryContainer").innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">चयनित फिल्टर के लिए कोई डेटा नहीं है!</div>';
-    $("summaryFarmerCount").textContent = "0";
-    $("summaryTotalGP").textContent = "0";
-    $("summaryTotalBore").textContent = "0";
-    $("summaryTotalQty").textContent = "0.00";
-    $("summaryGrandAmount").textContent = "₹0";
-    $("summaryVillageFilter").innerHTML = '<option value="">सभी गाँव (All Villages)</option>';
-    $("summaryModal").style.display = "flex";
-    return;
-  }
-
-  const farmerMap = new Map();
-  const summaryVillagesMap = new Map();
-
-  list.forEach(r => {
-    const rawName = getCustomer(r.data).replace(/\n/g, " ").trim() || "अज्ञात किसान";
-    const v = getVillage(r.data);
-    const m = getMobile(r.data);
-
-    if (v && v.trim()) {
-      const vClean = v.trim();
-      if (!summaryVillagesMap.has(norm(vClean))) {
-        summaryVillagesMap.set(norm(vClean), vClean);
-      }
-    }
-
-    const uniqueKey = norm(rawName) + "|" + norm(v) + "|" + norm(m);
-
-    if (!farmerMap.has(uniqueKey)) {
-      farmerMap.set(uniqueKey, {
-        uniqueKey: uniqueKey,
-        displayName: rawName,
-        village: v,
-        mobile: m,
-        items: [],
-        totalQty: 0,
-        totalBore: 0,
-        totalAmount: 0
-      });
-    }
-
-    const farmerObj = farmerMap.get(uniqueKey);
-    const calc = getCalculatedValues(r);
-
-    farmerObj.totalQty += calc.qty;
-    farmerObj.totalBore += calc.bore;
-    farmerObj.totalAmount += calc.amount;
-
-    farmerObj.items.push({
-      record: r,
-      gp: getGatepass(r.data) || "-",
-      date: shortDate(getDate(r.data)).replace(/\n/g, " "),
-      crop: getCrop(r.data) || "-",
-      village: v || farmerObj.village || "",
-      qty: calc.qty,
-      bore: calc.bore,
-      rate: calc.rate,
-      amount: calc.amount
-    });
-  });
-
-  currentSummaryFarmers = [...farmerMap.values()].sort((a,b) => a.displayName.localeCompare(b.displayName, 'hi'));
-
-  if (!selectedSummaryFarmerKeys.size) {
-    selectedSummaryFarmerKeys = new Set(currentSummaryFarmers.map(f => f.uniqueKey));
-  } else {
-    selectedSummaryFarmerKeys = new Set([...selectedSummaryFarmerKeys].filter(k => currentSummaryFarmers.some(f => f.uniqueKey === k)));
-  }
-
-  const sortedVillages = [...summaryVillagesMap.values()].sort((a,b) => a.localeCompare(b, 'hi'));
-  let vHtml = '<option value="">सभी गाँव (All Villages)</option>';
-  sortedVillages.forEach(v => {
-    vHtml += `<option value="${v}">${v}</option>`;
-  });
-  $("summaryVillageFilter").innerHTML = vHtml;
-
-  renderSummaryCards();
-  $("summaryModal").style.display = "flex";
-}
-
-function updateToggleCheckedBtnState() {
-  const btn = $("summaryToggleCheckedBtn");
-  if (showCheckedOnly) {
-    btn.textContent = `📋 Show All (${currentSummaryFarmers.length})`;
-    btn.className = "orange";
-  } else {
-    btn.textContent = `👁️ Show Checked (${selectedSummaryFarmerKeys.size})`;
-    btn.className = "purple";
-  }
-}
-
-function renderSummaryCards() {
-  const container = $("summaryContainer");
-  container.innerHTML = "";
-
-  const searchRaw = $("summarySearchInput").value.trim();
-  const searchQueries = searchRaw ? searchRaw.split(",").map(s => norm(s)).filter(Boolean) : [];
-  const selectedVillage = $("summaryVillageFilter").value;
-
-  let filteredFarmers = currentSummaryFarmers.filter(f => {
-    if (showCheckedOnly && !selectedSummaryFarmerKeys.has(f.uniqueKey)) {
-      return false;
-    }
-
-    if (selectedVillage) {
-      const fVillage = f.village || "";
-      const hasMatchingItemVillage = f.items.some(it => norm(it.village) === norm(selectedVillage));
-      if (norm(fVillage) !== norm(selectedVillage) && !hasMatchingItemVillage) {
-        return false;
-      }
-    }
-
-    if (searchQueries.length > 0) {
-      const isMatched = searchQueries.some(q => {
-        const nameMatch = norm(f.displayName).includes(q);
-        const villageMatch = norm(f.village || "").includes(q);
-        const mobileMatch = norm(f.mobile || "").includes(q);
-        const gpMatch = f.items.some(it => norm(it.gp).includes(q));
-        return nameMatch || villageMatch || mobileMatch || gpMatch;
-      });
-      if (!isMatched) return false;
-    }
-
-    return true;
-  });
-
-  let checkedFarmerCount = 0;
-  let totalGP = 0;
-  let totalBore = 0;
-  let totalQty = 0;
-  let grandTotalAmount = 0;
-
-  filteredFarmers.forEach(f => {
-    if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
-      checkedFarmerCount++;
-      totalGP += f.items.length;
-      totalBore += f.totalBore;
-      totalQty += f.totalQty;
-      grandTotalAmount += f.totalAmount;
-    }
-  });
-
-  $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
-  $("summaryTotalGP").textContent = totalGP;
-  $("summaryTotalBore").textContent = fmt(totalBore, 0);
-  $("summaryTotalQty").textContent = fmt(totalQty, 2);
-  $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
-  updateToggleCheckedBtnState();
-
-  const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
-  const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
-  const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
-  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल बोरे: ${fmt(totalBore, 0)} | कुल क्विंटल: ${fmt(totalQty, 2)} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
-
-  if (!filteredFarmers.length) {
-    container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--muted); font-weight:bold;">सर्च / फिल्टर के लिए कोई रिकॉर्ड नहीं मिला!</div>';
-    return;
-  }
-
-  filteredFarmers.forEach((farmer, idx) => {
-    const isChecked = selectedSummaryFarmerKeys.has(farmer.uniqueKey);
-    const card = document.createElement("div");
-    card.className = "summary-farmer-card" + (isChecked ? "" : " unselected");
-
-    let rowsHtml = "";
-    farmer.items.forEach((item, itemIdx) => {
-      const cleanGP = item.gp.length > 17 ? item.gp.replace("GP-49-", "") : item.gp;
-
-      rowsHtml += `
-        <tr>
-          <td style="text-align:center;">${itemIdx + 1}</td>
-          <td style="font-weight:700; color:var(--brand); overflow:hidden; text-overflow:ellipsis;" title="${item.gp}">${cleanGP}</td>
-          <td style="text-align:center; font-size:10.5px;">${item.date}</td>
-          <td style="text-align:right; color:var(--purple); font-weight:700;">${item.bore ? fmt(item.bore, 0) : "-"}</td>
-          <td style="text-align:right; color:var(--green); font-weight:800;">${item.qty ? fmt(item.qty, 2) : "-"}</td>
-        </tr>
-      `;
-    });
-
-    card.innerHTML = `
-      <div class="summary-farmer-header">
-        <div style="flex:1; min-width:0; padding-right:6px; display:flex; align-items:flex-start; gap:8px;">
-          <input type="checkbox" class="summary-cb no-print" data-key="${farmer.uniqueKey}" ${isChecked ? "checked" : ""} style="width:16px; height:16px; margin-top:2px; cursor:pointer;">
-          <div>
-            <div class="farmer-title">${idx + 1}. 👤 ${farmer.displayName}</div>
-            <div class="farmer-sub">
-              ${farmer.village ? `🏡 ${farmer.village}` : ""}
-              ${farmer.mobile ? ` 📞 ${farmer.mobile}` : ""}
-            </div>
-          </div>
-        </div>
-        <div style="text-align:right; white-space:nowrap;">
-          <div><span style="font-size:10.5px; color:var(--muted);">कुल GP:</span> <strong style="color:var(--brand); font-size:13px;">${farmer.items.length}</strong></div>
-          <div style="font-size:12px; color:var(--green); font-weight:800;">₹${fmt(farmer.totalAmount, 2)}</div>
-        </div>
-      </div>
-
-      <table class="summary-fit-table">
-        <thead>
-          <tr>
-            <th style="width:7%; text-align:center;">#</th>
-            <th style="width:40%;">Gatepass No.</th>
-            <th style="width:23%; text-align:center;">दिनांक</th>
-            <th style="width:13%; text-align:right;">बोरे</th>
-            <th style="width:17%; text-align:right;">क्विंटल</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="3" style="text-align:right; font-weight:700; font-size:11px; color:var(--primary);">
-              कुल: ${fmt(farmer.totalBore, 0)} बोरे | ${fmt(farmer.totalQty, 2)} Qtl:
-            </td>
-            <td colspan="2" style="text-align:right; color:var(--green); font-weight:800; font-size:12px;">
-              ₹${fmt(farmer.totalAmount, 2)}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    `;
-
-    const cb = card.querySelector(".summary-cb");
-    cb.addEventListener("change", (e) => {
-      if (e.target.checked) {
-        selectedSummaryFarmerKeys.add(farmer.uniqueKey);
-        card.classList.remove("unselected");
-      } else {
-        selectedSummaryFarmerKeys.delete(farmer.uniqueKey);
-        card.classList.add("unselected");
-      }
-      updateSummaryTotalsOnly(filteredFarmers);
-      updateToggleCheckedBtnState();
-    });
-
-    container.appendChild(card);
-  });
-}
-
-function updateSummaryTotalsOnly(filteredFarmers) {
-  let checkedFarmerCount = 0;
-  let totalGP = 0;
-  let totalBore = 0;
-  let totalQty = 0;
-  let grandTotalAmount = 0;
-
-  filteredFarmers.forEach(f => {
-    if (selectedSummaryFarmerKeys.has(f.uniqueKey)) {
-      checkedFarmerCount++;
-      totalGP += f.items.length;
-      totalBore += f.totalBore;
-      totalQty += f.totalQty;
-      grandTotalAmount += f.totalAmount;
-    }
-  });
-
-  $("summaryFarmerCount").textContent = `${checkedFarmerCount}/${filteredFarmers.length}`;
-  $("summaryTotalGP").textContent = totalGP;
-  $("summaryTotalBore").textContent = fmt(totalBore, 0);
-  $("summaryTotalQty").textContent = fmt(totalQty, 2);
-  $("summaryGrandAmount").textContent = "₹" + fmt(grandTotalAmount, 2);
-
-  const currentCrop = $("cropFilter").value ? `फसल: ${$("cropFilter").value}` : "सभी फसलें";
-  const currentSeason = $("seasonFilter").value ? `सीज़न: ${$("seasonFilter").value}` : "सभी सीज़न";
-  const selectedVillage = $("summaryVillageFilter").value;
-  const villageLabel = selectedVillage ? ` | गाँव: ${selectedVillage}` : "";
-  $("summaryPrintMeta").textContent = `${currentSeason} | ${currentCrop}${villageLabel} | चुने किसान: ${checkedFarmerCount} | कुल बोरे: ${fmt(totalBore, 0)} | कुल क्विंटल: ${fmt(totalQty, 2)} | कुल राशि: ₹${fmt(grandTotalAmount, 2)} | प्रिंट: ${new Date().toLocaleDateString("en-IN")}`;
-}
-
-$("summaryToggleCheckedBtn").addEventListener("click", () => {
-  if (!showCheckedOnly && selectedSummaryFarmerKeys.size === 0) {
-    showNotice("⚠️ पहले किसी किसान को टिक (Check) करें!");
-    return;
-  }
-  showCheckedOnly = !showCheckedOnly;
-  if (showCheckedOnly) {
-    $("summarySearchInput").value = "";
-  }
-  renderSummaryCards();
-});
-
-$("summarySelectAllBtn").addEventListener("click", () => {
-  currentSummaryFarmers.forEach(f => selectedSummaryFarmerKeys.add(f.uniqueKey));
-  renderSummaryCards();
-});
-
-$("summaryClearBtn").addEventListener("click", () => {
-  selectedSummaryFarmerKeys.clear();
-  renderSummaryCards();
-});
-
-$("summarySearchInput").addEventListener("input", () => {
-  showCheckedOnly = false;
-  renderSummaryCards();
-});
-$("summaryVillageFilter").addEventListener("change", renderSummaryCards);
-
-$("summaryPrintBtn").addEventListener("click", () => {
-  if (selectedSummaryFarmerKeys.size === 0) {
-    showNotice("⚠️ कृपया कम से कम एक किसान को टिक (Check) करें!");
-    return;
-  }
-  document.body.classList.add("printing-summary");
-  window.print();
-  setTimeout(() => {
-    document.body.classList.remove("printing-summary");
-  }, 1000);
-});
-
-/* Sync & Retain Dropdowns */
-$("uploadSeasonSelect").addEventListener("change", (e) => {
-  const val = e.target.value;
-  localStorage.setItem(LAST_SELECTED_SEASON_KEY, val);
-  $("seasonFilter").value = val;
-  if (excelRows.length) {
-    const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
-    setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
-  }
-  render();
-});
-
-$("uploadCropSelect").addEventListener("change", (e) => {
-  const val = e.target.value;
-  localStorage.setItem(LAST_SELECTED_CROP_KEY, val);
-  $("cropFilter").value = val;
-  if (excelRows.length) {
-    const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
-    setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
-  }
-  render();
-});
-
-$("seasonFilter").addEventListener("change", (e) => {
-  if (e.target.value && e.target.value !== "__UNASSIGNED__") {
-    $("uploadSeasonSelect").value = e.target.value;
-    localStorage.setItem(LAST_SELECTED_SEASON_KEY, e.target.value);
-    if (excelRows.length) {
-      const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
-      setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
-    }
-  }
-  render();
-});
-
-$("cropFilter").addEventListener("change", (e) => {
-  if (e.target.value && e.target.value !== "__UNASSIGNED__") {
-    $("uploadCropSelect").value = e.target.value;
-    localStorage.setItem(LAST_SELECTED_CROP_KEY, e.target.value);
-    if (excelRows.length) {
-      const { selSeason, selCrop } = applySelectedSeasonAndCropToRows(excelRows);
-      setUpload("📄 Excel Ready (" + excelRows.length + " rows | " + selSeason + " - " + selCrop + ")");
-    }
-  }
-  render();
-});
-
-["search","biometricFilter","auctionFilter","villageFilter","fromDate","toDate","sortOrder"].forEach(id => {
-  const el = $(id);
-  if (el) el.addEventListener(id === "search" ? "input" : "change", render);
-});
-
-$("clearFilters").addEventListener("click", () => {
-  $("search").value = ""; 
-  $("seasonFilter").value = "";
-  $("cropFilter").value = "";
-  $("biometricFilter").value = "";
-  $("auctionFilter").value = "";
-  $("villageFilter").value = "";
-  $("fromDate").value = "";
-  $("toDate").value = "";
-  $("sortOrder").value = "uploadNewest";
-  render();
-});
-
-$("refreshBtn").addEventListener("click", async () => {
-  try {
-    setConnection("🔄 Syncing...");
-    await recordsRef.once("value");
-    await paymentRecordsRef.once("value");
-    setConnection("🟢 Firebase Online (" + records.length + " GP Rows)");
-  } catch (e) { setConnection("❌ Sync Error", true); }
-});
-
 startFirebase();
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/J-form/service-worker.js")
-      .then(() => console.log("Service Worker Registered"))
-      .catch(err => console.error("Service Worker Error:", err));
-  });
-}
 </script>
 </body>
 </html>
